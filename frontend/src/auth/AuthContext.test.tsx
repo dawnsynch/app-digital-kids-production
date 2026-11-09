@@ -15,15 +15,18 @@ const parent: User = {
   is_active: true,
   created_at: '2026-11-09T00:00:00Z',
 }
+const learner: User = { ...parent, id: 11, full_name: 'Secure Learner', email: null, role: 'learner', parent_id: 10, student_id: 31 }
 
 function Harness() {
-  const { status, user, login, register, logout } = useAuth()
+  const { status, user, login, register, redeemLearner, logoutLearner, logout } = useAuth()
   return (
     <div>
       <span data-testid="status">{status}</span>
       <span data-testid="user">{user?.full_name || 'none'}</span>
       <button onClick={() => void login({ email: 'parent@example.com', password: 'password123' }).catch(() => undefined)}>login</button>
       <button onClick={() => void register({ full_name: 'Test Parent', email: 'parent@example.com', password: 'password123' }).catch(() => undefined)}>register</button>
+      <button onClick={() => void redeemLearner('challenge', '246810').catch(() => undefined)}>redeem learner</button>
+      <button onClick={() => void logoutLearner()}>logout learner</button>
       <button onClick={logout}>logout</button>
     </div>
   )
@@ -32,6 +35,7 @@ function Harness() {
 afterEach(() => {
   cleanup()
   apiClient.setAccessToken(null)
+  vi.restoreAllMocks()
 })
 
 describe('AuthProvider', () => {
@@ -69,5 +73,17 @@ describe('AuthProvider', () => {
     fireEvent.click(screen.getByRole('button', { name: 'login' }))
     await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('anonymous'))
     expect(screen.getByTestId('user')).toHaveTextContent('none')
+  })
+
+  it('replaces the parent identity with a verified learner session and revokes it on logout', async () => {
+    vi.spyOn(apiClient, 'redeemLearnerHandoff').mockResolvedValue({ access_token: 'learner-token', token_type: 'bearer', user: learner })
+    vi.spyOn(apiClient, 'currentUser').mockResolvedValue(learner)
+    vi.spyOn(apiClient, 'learnerLogout').mockResolvedValue(null)
+    render(<AuthProvider><Harness /></AuthProvider>)
+    fireEvent.click(screen.getByRole('button', { name: 'redeem learner' }))
+    await waitFor(() => expect(screen.getByTestId('user')).toHaveTextContent('Secure Learner'))
+    fireEvent.click(screen.getByRole('button', { name: 'logout learner' }))
+    await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('anonymous'))
+    expect(apiClient.learnerLogout).toHaveBeenCalledOnce()
   })
 })

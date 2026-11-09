@@ -40,12 +40,47 @@ class User(Base):
     parent_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
     student_id: Mapped[int | None] = mapped_column(ForeignKey("students.id"), unique=True, nullable=True, index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    learner_pin_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    learner_access_enabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    learner_session_version: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    pin_failed_attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    pin_locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
     parent: Mapped["User | None"] = relationship(remote_side=[id], foreign_keys=[parent_id])
     students: Mapped[list[Student]] = relationship(back_populates="parent", foreign_keys=[Student.parent_id])
     student: Mapped[Student | None] = relationship(back_populates="learner_account", foreign_keys=[student_id])
     learning_interactions: Mapped[list["LearningInteraction"]] = relationship(back_populates="user", foreign_keys="LearningInteraction.user_id")
+    learner_sessions: Mapped[list["LearnerSession"]] = relationship(back_populates="user")
+
+
+class LearnerHandoff(Base):
+    __tablename__ = "learner_handoffs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    challenge_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
+    student_id: Mapped[int] = mapped_column(ForeignKey("students.id"), nullable=False, index=True)
+    parent_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    failed_attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+
+class LearnerSession(Base):
+    __tablename__ = "learner_sessions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    token_id: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    student_id: Mapped[int] = mapped_column(ForeignKey("students.id"), nullable=False, index=True)
+    credential_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+    user: Mapped[User] = relationship(back_populates="learner_sessions")
 
 
 class AssessmentAttempt(Base):

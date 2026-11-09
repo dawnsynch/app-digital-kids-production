@@ -3,9 +3,12 @@ import { NOTIFICATIONS } from '../../data/dashboard'
 import { IMAGES } from '../../data/images'
 import { BellIcon } from '../icons/Icons'
 import { useUI } from '../ui/UIContext'
+import { useAuth } from '../../auth/AuthContext'
 
 export default function TopBar() {
   const { notify } = useUI()
+  const { user } = useAuth()
+  const learnerName = user?.role === 'learner' ? user.full_name : 'Amina'
   const [open, setOpen] = useState(false)
   const bellRef = useRef<HTMLDivElement>(null)
 
@@ -22,7 +25,7 @@ export default function TopBar() {
     <header className="topbar">
       <div className="topbar__greeting">
         <h1 className="topbar__title">
-          Good afternoon, Amina! <span className="topbar__wave">👋</span>
+          Good afternoon, {learnerName}! <span className="topbar__wave">👋</span>
         </h1>
         <p className="topbar__subtitle">Ready to learn something new today?</p>
       </div>
@@ -30,7 +33,7 @@ export default function TopBar() {
       <div className="topbar__stats">
         <div className="stat-chip stat-chip--grade">
           <img src={IMAGES.gradeCap} alt="" className="stat-chip__cap" />
-          <span>Grade 6</span>
+          <span>{user?.role === 'learner' ? 'Verified learner' : 'Grade 6'}</span>
         </div>
 
         <span className="stat-divider" aria-hidden="true" />
@@ -91,10 +94,10 @@ export default function TopBar() {
         <button
           type="button"
           className="avatar"
-          aria-label="Open Amina's profile"
-          onClick={() => notify('Profile: Amina — Grade 6 learner')}
+          aria-label={`Open ${learnerName}'s profile`}
+          onClick={() => notify(user?.role === 'learner' ? `Verified learner: ${learnerName}` : 'Profile: Amina — Grade 6 learner')}
         >
-          <img src={IMAGES.avatar} alt="Amina" />
+          <img src={IMAGES.avatar} alt={learnerName} />
         </button>
       </div>
     </header>

@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     jwt_secret_key: str | None = None
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
+    learner_session_expire_minutes: int = 30
+    learner_handoff_expire_seconds: int = 180
+    learner_pin_max_attempts: int = 5
+    learner_pin_cooldown_seconds: int = 60
     tz: str = "Africa/Nairobi"
     max_questions_per_request: int = 10
     max_answer_length: int = 2000

@@ -9,6 +9,8 @@ type AuthContextValue = {
   user: User | null
   login: (credentials: LoginCredentials) => Promise<User>
   register: (registration: ParentRegistration) => Promise<User>
+  redeemLearner: (challenge: string, pin: string) => Promise<User>
+  logoutLearner: () => Promise<void>
   logout: () => void
 }
 
@@ -54,7 +56,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [establishSession],
   )
 
-  const value = useMemo(() => ({ status, user, login, register, logout: clearSession }), [status, user, login, register, clearSession])
+  const redeemLearner = useCallback(
+    (challenge: string, pin: string) => establishSession(() => apiClient.redeemLearnerHandoff(challenge, pin)),
+    [establishSession],
+  )
+
+  const logoutLearner = useCallback(async () => {
+    try {
+      await apiClient.learnerLogout()
+    } finally {
+      clearSession()
+    }
+  }, [clearSession])
+
+  const value = useMemo(
+    () => ({ status, user, login, register, redeemLearner, logoutLearner, logout: clearSession }),
+    [status, user, login, register, redeemLearner, logoutLearner, clearSession],
+  )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

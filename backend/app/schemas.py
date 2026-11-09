@@ -47,6 +47,32 @@ class TokenResponse(BaseModel):
     user: UserOut
 
 
+class LearnerPinConfigureRequest(BaseModel):
+    parent_password: str = Field(..., min_length=1, max_length=128)
+    pin: str = Field(..., pattern=r"^\d{6}$")
+
+
+class ParentPasswordRequest(BaseModel):
+    parent_password: str = Field(..., min_length=1, max_length=128)
+
+
+class LearnerAccessStatus(BaseModel):
+    student_id: int
+    pin_configured: bool
+    access_enabled: bool
+
+
+class LearnerHandoffOut(BaseModel):
+    challenge: str
+    expires_in_seconds: int
+    learner: "StudentOut"
+
+
+class LearnerRedeemRequest(BaseModel):
+    challenge: str = Field(..., min_length=32, max_length=256)
+    pin: str = Field(..., pattern=r"^\d{6}$")
+
+
 class StudentCreate(BaseModel):
     name: str = Field(..., min_length=2, max_length=120)
     grade: int = Field(..., ge=5, le=7)
@@ -102,6 +128,11 @@ class StudentOut(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class LearnerIdentityOut(BaseModel):
+    user: UserOut
+    learner: StudentOut
 
 
 class LearnerAccountCreate(BaseModel):

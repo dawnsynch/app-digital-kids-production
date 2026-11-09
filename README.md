@@ -4,7 +4,7 @@ Consolidated Phase 1 repository containing the existing FastAPI MVP and the exis
 
 ## Status
 
-**Phase 1B recommendation: CONDITIONAL GO for Phase 1C secure learner authentication; NO GO for production or new learning modules.** Authenticated parents can create, list, view, edit, and select only their own learner profiles. Selection is memory-only and is not learner authentication; the PIN screen remains a non-authorizing preview. See the [Phase 1B report](docs/mvp1-integration/phase1b-learner-profiles.md).
+**Phase 1C recommendation: CONDITIONAL GO for Phase 2A CBC Practice integration; NO GO for production.** Owning parents can configure/reset/disable a hashed learner PIN, issue a short-lived single-use handoff, and establish a learner-scoped, expiring, server-revocable session. Parent and learner tokens remain memory-only and mutually isolated. See the [Phase 1C report](docs/mvp1-integration/phase1c-secure-learner-authentication.md).
 
 ## Repository layout
 
@@ -32,7 +32,7 @@ Prerequisites: Python 3.12+, Node.js 20+ (Node 22 recommended), npm, and optiona
 cp .env.example .env
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.txt -r requirements-migrations.txt
 cd frontend && npm ci && cd ..
 ```
 
@@ -41,6 +41,7 @@ Run the API and React app in separate terminals:
 ```bash
 # Terminal 1, repository root
 source .venv/bin/activate
+alembic upgrade head
 uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
 
 # Terminal 2
@@ -124,6 +125,7 @@ python3 scripts/sqlite_backup.py \
 - [GO / NO-GO assessment](docs/mvp1-integration/08-go-no-go-assessment.md)
 - [Phase 1A parent authentication](docs/mvp1-integration/phase1a-parent-authentication.md)
 - [Phase 1B learner profiles](docs/mvp1-integration/phase1b-learner-profiles.md)
+- [Phase 1C secure learner authentication](docs/mvp1-integration/phase1c-secure-learner-authentication.md)
 
 New learning-module development remains out of scope until the existing MVP screens are integrated and accepted.
 

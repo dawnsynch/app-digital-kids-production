@@ -29,3 +29,15 @@ export function PublicParentRoute() {
   if (status === 'authenticated' && user?.role === 'parent') return <Navigate to="/parent/select-learner" replace />
   return <Outlet />
 }
+
+export function LearnerRoute() {
+  const { status, user } = useAuth()
+  const location = useLocation()
+  if (status !== 'authenticated') {
+    return <Navigate to="/parent/sign-in" replace state={{ sessionRequired: true, from: location.pathname }} />
+  }
+  if (user?.role !== 'learner') {
+    return <Navigate to="/parent/select-learner" replace />
+  }
+  return <Outlet />
+}

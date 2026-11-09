@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { Student } from '../api/types'
+import { ApiError, apiClient } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import AuthCard from '../components/parent-auth/AuthCard'
 import AuthFeedback from '../components/parent-auth/AuthFeedback'
 import LearnerProfileDialog from '../components/parent-auth/LearnerProfileDialog'
+import ManageLearnerPinDialog from '../components/parent-auth/ManageLearnerPinDialog'
 import { ArrowRightIcon, GearIcon } from '../components/icons/Icons'
 import { useLearnerSelection } from '../learners/LearnerSelectionContext'
 
-type DialogState = { mode: 'create' } | { mode: 'view' | 'edit'; learner: Student } | null
+type DialogState = { mode: 'create' } | { mode: 'view' | 'edit' | 'pin'; learner: Student } | null
 
 const learnerImages = ['/assets/girl-hero.png', '/assets/illus-science.png'] as const
 
@@ -39,12 +41,24 @@ export default function ParentSelectLearnerPage() {
     navigate('/parent/sign-in', { replace: true, state: { signedOut: true } })
   }
 
-  const continueAs = (learner: Student) => {
+  const continueAs = async (learner: Student) => {
     if (!selectLearner(learner.id)) {
       setFeedback('This learner is no longer available. Refresh the list and try again.')
       return
     }
-    navigate(`/learner/pin?learner=${learner.id}`)
+    setFeedback('')
+    try {
+      const handoff = await apiClient.createLearnerHandoff(learner.id)
+      logout()
+      navigate('/learner/pin', { state: { handoff } })
+    } catch (requestError) {
+      if (requestError instanceof ApiError && requestError.status === 409) {
+        setFeedback(`Set a learner PIN for ${learner.name} before authorizing access.`)
+        setDialog({ mode: 'pin', learner })
+      } else {
+        setFeedback('Learner access could not be authorized. Refresh and try again.')
+      }
+    }
   }
 
   return (
@@ -77,10 +91,11 @@ export default function ParentSelectLearnerPage() {
               <p>Grade {learner.grade}</p>
               <strong>{learner.age_group ? `Age group ${learner.age_group}` : 'Age group not provided'}</strong>
               {selectedLearner?.id === learner.id ? <small>✓ Selected learner</small> : <small>Parent-managed profile</small>}
-              <button type="button" className="parent-auth-button" onClick={() => continueAs(learner)}>Continue as {learner.name} <ArrowRightIcon size={17} /></button>
+              <button type="button" className="parent-auth-button" onClick={() => void continueAs(learner)}>Continue as {learner.name} <ArrowRightIcon size={17} /></button>
               <div className="learner-choice__manage">
                 <button type="button" onClick={() => setDialog({ mode: 'view', learner })}>View details</button>
                 <button type="button" onClick={() => setDialog({ mode: 'edit', learner })}>Edit</button>
+                <button type="button" onClick={() => setDialog({ mode: 'pin', learner })}>Manage PIN</button>
               </div>
             </article>
           ))}
@@ -93,7 +108,13 @@ export default function ParentSelectLearnerPage() {
       </div>
       {feedback ? <AuthFeedback>{feedback}</AuthFeedback> : null}
 
-      {dialog ? (
+      {dialog?.mode === 'pin' ? (
+        <ManageLearnerPinDialog
+          learner={dialog.learner}
+          onClose={() => setDialog(null)}
+          onSaved={setFeedback}
+        />
+      ) : dialog ? (
         <LearnerProfileDialog
           mode={dialog.mode}
           learner={'learner' in dialog ? dialog.learner : undefined}

@@ -7,8 +7,10 @@ from ..database import get_db
 from ..models import User
 from ..schemas import LoginRequest, ParentRegisterRequest, TokenResponse, UserOut
 from ..security import (
+    LEARNER_ROLE,
     PARENT_ROLE,
     create_access_token,
+    create_learner_access_token,
     get_current_user,
     hash_password,
     require_jwt_configured,
@@ -61,6 +63,12 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
     if not user or not user.is_active or not verify_password(payload.password, user.password_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid login credentials")
 
+    if user.role == LEARNER_ROLE:
+        if not user.learner_access_enabled:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid login credentials")
+        access_token, _ = create_learner_access_token(db, user)
+        db.commit()
+        return {"access_token": access_token, "user": user}
     return {"access_token": create_access_token(user), "user": user}
 
 

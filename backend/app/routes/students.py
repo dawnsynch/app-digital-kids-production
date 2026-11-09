@@ -105,6 +105,7 @@ def create_learner_account(
         role=LEARNER_ROLE,
         parent_id=current_user.id,
         student_id=student.id,
+        learner_access_enabled=True,
     )
     db.add(user)
     db.commit()

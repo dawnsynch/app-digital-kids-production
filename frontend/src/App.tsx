@@ -18,7 +18,8 @@ import ParentGetStartedPage from './pages/ParentGetStartedPage'
 import ParentRegisterPage from './pages/ParentRegisterPage'
 import ParentSelectLearnerPage from './pages/ParentSelectLearnerPage'
 import ParentSignInPage from './pages/ParentSignInPage'
-import { ParentRoute, PublicParentRoute } from './auth/AuthRoutes'
+import { LearnerRoute, ParentRoute, PublicParentRoute } from './auth/AuthRoutes'
+import AuthenticatedLearnerDashboardPage from './pages/AuthenticatedLearnerDashboardPage'
 
 export default function App() {
   return (
@@ -37,6 +38,11 @@ export default function App() {
         </Route>
         <Route element={<ParentAuthLayout />}>
           <Route path="/learner/pin" element={<LearnerPinPage />} />
+        </Route>
+        <Route element={<LearnerRoute />}>
+          <Route element={<AppLayout />}>
+            <Route path="/learner/dashboard" element={<AuthenticatedLearnerDashboardPage />} />
+          </Route>
         </Route>
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />

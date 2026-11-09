@@ -18,6 +18,23 @@ export interface AuthToken {
   user: User
 }
 
+export interface LearnerAccessStatus {
+  student_id: number
+  pin_configured: boolean
+  access_enabled: boolean
+}
+
+export interface LearnerHandoff {
+  challenge: string
+  expires_in_seconds: number
+  learner: Student
+}
+
+export interface LearnerIdentity {
+  user: User
+  learner: Student
+}
+
 export interface ParentRegistration {
   full_name: string
   email: string

@@ -21,7 +21,8 @@ Status meanings: **Available** = matching backend capability exists; **Partial**
 | Parent registration `/parent/register` | `POST /auth/register-parent` | Backend available; React remains explicit preview. Phone/consent fields are not backend fields. |
 | Parent sign-in `/parent/sign-in` | `POST /auth/login`, `GET /auth/me` | Backend available; React still uses fake demo credentials. |
 | Learner selection `/parent/select-learner` | `GET/POST /students`, `GET/PATCH /students/{id}` | **Integrated in Phase 1B** with real parent-owned data, create/view/edit, loading/empty/error/retry states, and memory-only authorized selection. |
-| Learner PIN `/learner/pin` | No PIN endpoint; learner username/password login exists | Explicit preview only; creates no learner token or protected session. Secure authentication is a separate Phase 1C milestone. |
+| Learner PIN `/learner/pin` | PIN setup, single-use handoff, redeem, learner identity, logout, and revocation endpoints | **Integrated in Phase 1C**; six-digit PIN is server-verified and browser-memory-only. Direct access without handoff is rejected. |
+| Verified learner dashboard `/learner/dashboard` | `GET /auth/learner/me`, revocable learner JWT/session | **Integrated in Phase 1C**; name and grade are real, while learning cards remain explicitly preview content pending Phase 2A. |
 | Progress `/progress` | learner progress and parent summary endpoints | Partial; React is static. |
 | Achievements `/achievements` | No achievements endpoint | Gap. |
 | Profile `/profile` | `GET /auth/me`, `GET /students/{id}`; no update endpoint | Read-only partial. |

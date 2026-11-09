@@ -4,6 +4,9 @@ import type {
   CodingLessonRequest,
   HealthStatus,
   LearnerAccountCreate,
+  LearnerAccessStatus,
+  LearnerHandoff,
+  LearnerIdentity,
   LoginCredentials,
   ParentRegistration,
   ProgressSummary,
@@ -27,6 +30,7 @@ export class ApiError extends Error {
     message: string,
     readonly status: number,
     readonly details?: unknown,
+    readonly retryAfterSeconds?: number,
   ) {
     super(message)
     this.name = 'ApiError'
@@ -71,6 +75,7 @@ export class ApiClient {
         typeof detail === 'string' ? detail : validationMessage || response.statusText || 'Request failed',
         response.status,
         detail,
+        Number(response.headers.get('Retry-After')) || undefined,
       )
     }
     return payload as T
@@ -87,6 +92,16 @@ export class ApiClient {
     this.request<Student>(`/students/${studentId}`, { method: 'PATCH', body: payload })
   createLearnerAccount = (studentId: number, payload: LearnerAccountCreate) =>
     this.request<User>(`/students/${studentId}/learner-account`, { method: 'POST', body: payload })
+  learnerAccessStatus = (studentId: number) => this.request<LearnerAccessStatus>(`/students/${studentId}/learner-access`)
+  configureLearnerPin = (studentId: number, parentPassword: string, pin: string) =>
+    this.request<LearnerAccessStatus>(`/students/${studentId}/learner-pin`, { method: 'POST', body: { parent_password: parentPassword, pin } })
+  disableLearnerPin = (studentId: number, parentPassword: string) =>
+    this.request<LearnerAccessStatus>(`/students/${studentId}/learner-pin/disable`, { method: 'POST', body: { parent_password: parentPassword } })
+  createLearnerHandoff = (studentId: number) => this.request<LearnerHandoff>(`/students/${studentId}/learner-handoff`, { method: 'POST' })
+  redeemLearnerHandoff = (challenge: string, pin: string) =>
+    this.request<AuthToken>('/auth/learner/redeem', { method: 'POST', body: { challenge, pin } })
+  learnerIdentity = () => this.request<LearnerIdentity>('/auth/learner/me')
+  learnerLogout = () => this.request<null>('/auth/learner/logout', { method: 'POST' })
   revisionOptions = () => this.request<RevisionOptions>('/revision/options')
   generateRevision = (payload: RevisionGenerateRequest) => this.request<RevisionAssessment>('/revision/generate', { method: 'POST', body: payload })
   saveRevisionAnswers = (assessmentId: number, answers: RevisionAnswer[]) =>

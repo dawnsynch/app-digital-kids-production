@@ -4,7 +4,7 @@ const publicRoutes = [
   ['/parent/get-started', 'Learning made personal, safe and fun.'],
   ['/parent/register', 'Create Your Parent Account'],
   ['/parent/sign-in', 'Welcome Back'],
-  ['/learner/pin?learner=amina', 'Hi Amina! 👋'],
+  ['/learner/pin', 'Learner authorization required'],
 ] as const
 
 function uniqueParent() {
@@ -121,12 +121,9 @@ test.describe('Phase 1A parent authentication', () => {
     await expect(password).toHaveAttribute('type', 'text')
   })
 
-  test('learner PIN remains a non-authenticated preview and is not expanded in Phase 1A', async ({ page }) => {
-    await page.goto('/learner/pin?learner=david')
-    for (const [index, digit] of ['9', '9', '9', '9'].entries()) {
-      await page.getByLabel(`PIN digit ${index + 1}`).fill(digit)
-    }
-    await page.getByRole('button', { name: 'Preview PIN Check' }).click()
-    await expect(page.getByText('That demo PIN is not correct. Use 1234.')).toBeVisible()
+  test('learner PIN rejects direct access without a parent-authorized handoff', async ({ page }) => {
+    await page.goto('/learner/pin')
+    await expect(page.getByText(/handoff is missing or expired/i)).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Parent Sign In' })).toBeVisible()
   })
 })

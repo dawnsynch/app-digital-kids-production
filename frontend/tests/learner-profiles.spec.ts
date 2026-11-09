@@ -96,16 +96,12 @@ test.describe('Phase 1B learner profiles', () => {
     expect((await request.patch(`${apiBase}/students/${learner.id}`, { headers: parentBHeaders, data: { name: 'Blocked' } })).status()).toBe(404)
   })
 
-  test('learner selection survives route navigation but creates no learner session', async ({ page }) => {
+  test('learner selection requires parent-controlled PIN configuration', async ({ page }) => {
     await registerUiParent(page)
     await createUiLearner(page, 'Selected Learner')
     await page.getByRole('button', { name: 'Continue as Selected Learner' }).click()
-    await expect(page).toHaveURL(/\/learner\/pin\?learner=\d+$/)
-    await expect(page.getByRole('heading', { name: 'Hi Selected Learner! 👋' })).toBeVisible()
-    await expect(page.getByText('Preview only.')).toBeVisible()
-    await page.getByRole('button', { name: 'Switch Learner' }).click()
-    await expect(page).toHaveURL(/\/parent\/select-learner$/)
-    await expect(page.getByText('✓ Selected learner')).toBeVisible()
+    await expect(page.getByRole('dialog', { name: "Manage Selected Learner's PIN" })).toBeVisible()
+    await expect(page.getByText(/Set a learner PIN/)).toBeVisible()
   })
 
   test('validation errors keep the create dialog open', async ({ page }) => {
@@ -154,7 +150,7 @@ test.describe('Phase 1B learner profiles', () => {
     const account = await registerUiParent(page)
     await createUiLearner(page, 'Session Learner')
     await page.getByRole('button', { name: 'Continue as Session Learner' }).click()
-    await page.getByRole('button', { name: 'Switch Learner' }).click()
+    await page.getByRole('button', { name: 'Close dialog' }).click()
     await expect(page.getByText('✓ Selected learner')).toBeVisible()
     await page.getByRole('button', { name: 'Sign Out' }).click()
     await page.getByLabel('Email Address').fill(account.email)

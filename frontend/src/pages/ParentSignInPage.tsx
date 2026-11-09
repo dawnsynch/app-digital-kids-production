@@ -8,11 +8,15 @@ import { authenticationErrorMessage, useAuth } from '../auth/AuthContext'
 
 export default function ParentSignInPage() {
   const location = useLocation()
-  const state = location.state as { email?: string; from?: string; sessionRequired?: boolean; signedOut?: boolean } | null
+  const state = location.state as { email?: string; from?: string; sessionRequired?: boolean; signedOut?: boolean; learnerSignedOut?: boolean } | null
   const [identity, setIdentity] = useState(state?.email || '')
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<{ identity?: string; password?: string; form?: string }>({})
-  const [feedback, setFeedback] = useState(state?.sessionRequired ? 'Sign in with a parent account to continue.' : state?.signedOut ? 'You have signed out successfully.' : '')
+  const [feedback, setFeedback] = useState(state?.sessionRequired
+    ? 'Sign in with a parent account to continue.'
+    : state?.learnerSignedOut
+      ? 'The learner session was signed out securely. A parent must authorize the next learner session.'
+      : state?.signedOut ? 'You have signed out successfully.' : '')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const { login, logout } = useAuth()

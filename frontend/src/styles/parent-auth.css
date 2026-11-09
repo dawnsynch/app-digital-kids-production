@@ -202,6 +202,8 @@
 .learner-profile-form input:focus, .learner-profile-form select:focus { border-color: var(--pa-blue); box-shadow: 0 0 0 3px rgba(7, 95, 243, .1); }
 .learner-profile-form input[aria-invalid='true'] { border-color: #ef6372; }
 .learner-profile-form small { color: #b42332; font-size: 10px; }
+.learner-pin-disable { border: 0; background: transparent; color: #a32424; font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; }
+.learner-pin-disable:disabled { cursor: wait; opacity: .55; }
 @keyframes learner-spin { to { transform: rotate(360deg); } }
 .parent-entry-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
 .parent-entry-actions button { display: grid; grid-template-columns: 38px 1fr; grid-template-rows: auto auto; align-items: center; min-height: 84px; padding: 12px; border: 1.5px dashed #adbee0; border-radius: 13px; text-align: left; }
@@ -214,7 +216,7 @@
 .learner-pin-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: 68% 28%; }
 .learner-pin-form { margin-top: 17px; }
 .learner-pin-form fieldset { margin: 0; padding: 0; border: 0; }
-.learner-pin-fields { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 310px; margin: 0 auto; }
+.learner-pin-fields { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; max-width: 360px; margin: 0 auto; }
 .learner-pin-fields input { width: 100%; height: 64px; border: 1.5px solid #9bb8ed; border-radius: 12px; outline: 0; color: var(--pa-ink); background: #f9fbff; font: 800 25px/1 'Nunito', sans-serif; text-align: center; }
 .learner-pin-fields input:focus { border-color: var(--pa-blue); box-shadow: 0 0 0 4px rgba(7,95,243,.12); }
 .learner-pin-form .parent-auth-feedback { max-width: 310px; margin: 10px auto 0; }
@@ -223,6 +225,10 @@
 .learner-pin-kito { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 18px; }
 .learner-pin-kito img { width: 70px; height: 96px; object-fit: contain; }
 .learner-pin-kito p { padding: 10px 14px; border-radius: 14px 14px 14px 4px; color: #293162; background: #edf2ff; font-size: 11px; font-weight: 700; text-align: left; }
+.learner-session-banner { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 22px; padding: 16px 20px; border: 1px solid #b8d5ff; border-radius: 16px; color: #10265f; background: #edf6ff; }
+.learner-session-banner div { display: grid; gap: 3px; }
+.learner-session-banner span, .learner-session-banner small { color: #4e638e; }
+.learner-session-banner button { padding: 10px 16px; border: 0; border-radius: 999px; color: #fff; background: #135cf4; font: inherit; font-weight: 800; cursor: pointer; }
 
 @media (max-width: 760px) {
   .parent-auth-shell { display: block; padding: 76px 14px 28px; overflow: visible; }
@@ -255,6 +261,7 @@
   .parent-entry-actions { grid-template-columns: 1fr; }
   .learner-pin-fields { gap: 8px; }
   .learner-pin-fields input { height: 58px; }
+  .learner-session-banner { align-items: stretch; flex-direction: column; }
 }
 
 @media (max-width: 390px) {

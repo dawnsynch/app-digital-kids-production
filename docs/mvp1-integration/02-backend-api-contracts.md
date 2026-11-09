@@ -10,8 +10,11 @@ Status: **Client** means a typed method exists in `frontend/src/api/client.ts`; 
 | --- | --- | --- | --- | --- | --- | --- |
 | `GET /health` | none → operational health object | Public | Deployment/diagnostic use | Client | Add explicit backend response model so OpenAPI describes diagnostics | Full contract test |
 | `POST /auth/register-parent` | `ParentRegisterRequest` → `TokenResponse` | Public | `/parent/register` | **Integrated** | Phone/consent persistence still requires a separately approved contract | Success, duplicate email, validation, hash non-disclosure |
-| `POST /auth/login` | `LoginRequest` → `TokenResponse` | Public | `/parent/sign-in`; future learner login | **Parent integrated** | Learner PIN still has no matching contract | Valid/invalid parent login and role separation |
+| `POST /auth/login` | `LoginRequest` → `TokenResponse` | Public; learner login creates a revocable learner session | `/parent/sign-in`; legacy learner username login | **Integrated** | Review legacy learner password UX before production | Valid/invalid login, role separation, revocable learner session |
 | `GET /auth/me` | none → `UserOut` | Any authenticated active user | Auth bootstrap/role routing | **Integrated** | No Phase 1A contract change required | Valid, missing, invalid, tampered, expired, inactive, all roles, hash exclusion |
+| `POST /auth/learner/redeem` | `LearnerRedeemRequest` → `TokenResponse` | Single-use challenge plus PIN | `/learner/pin` | **Integrated in Phase 1C** | None for Phase 1C | Correct/incorrect PIN, expiry, reuse, cooldown |
+| `GET /auth/learner/me` | none → `LearnerIdentityOut` | Active, unrevoked learner session only | `/learner/dashboard` | **Integrated in Phase 1C** | Reuse for Phase 2A identity | Parent denial, learner identity/scoping |
+| `POST /auth/learner/logout` | none → 204 | Active learner session only | Learner dashboard | **Integrated in Phase 1C** | None | Server-side revocation verified |
 
 ## Learner profiles
 
@@ -22,6 +25,10 @@ Status: **Client** means a typed method exists in `frontend/src/api/client.ts`; 
 | `GET /students/{student_id}` | path ID → `StudentOut` | Owning parent or linked learner; cross-parent probe returns 404 | Learner details and selection context | **Integrated** | No Phase 1B contract change required | Own learner and cross-parent concealment tested |
 | `PATCH /students/{student_id}` | `StudentUpdate` → `StudentOut` | Parent only; ownership-filtered; no ownership field accepted | Learner edit dialog | **Integrated (Phase 1B)** | Retain stable IDs and linked records | Own update, validation, role denial, cross-parent concealment, assessment link tested |
 | `POST /students/{student_id}/learner-account` | `LearnerAccountCreate` → `UserOut` | Parent only and must own student | Parent learner management | Client; no active form | Define username/password UX; do not substitute the four-digit PIN | Owner and cross-parent denial tested |
+| `GET /students/{student_id}/learner-access` | none → `LearnerAccessStatus` | Owning parent | Learner PIN management | **Integrated in Phase 1C** | None | Ownership and state tested |
+| `POST /students/{student_id}/learner-pin` | PIN + parent password → `LearnerAccessStatus` | Owning parent with password re-verification | Manage PIN dialog | **Integrated in Phase 1C** | None | Hashing, validation, reset revocation, cross-parent denial |
+| `POST /students/{student_id}/learner-pin/disable` | parent password → `LearnerAccessStatus` | Owning parent with password re-verification | Manage PIN dialog | **Integrated in Phase 1C** | None | Disablement and session revocation tested |
+| `POST /students/{student_id}/learner-handoff` | none → `LearnerHandoffOut` | Owning parent; configured learner only | Learner selection | **Integrated in Phase 1C** | None | Binding, replacement, missing PIN, ownership tested |
 
 ## CBC revision, answers, and marking
 
@@ -69,7 +76,7 @@ All routes below use `require_admin`. There is no React admin route in the curre
 ## Contract risks and required preparation
 
 1. Add response models for health, revision options/detail, progress summary aggregate, and custom admin rows before generating frontend types from OpenAPI.
-2. Decide learner authentication UX. The backend supports username/password; the React four-digit PIN is demo-only and has no secure API contract.
+2. Retain Phase 1C learner token audience/type, session revocation, and parent-to-learner credential isolation in every future learner route.
 3. Define field-level permissions for interaction updates rather than relying only on student ownership.
 4. Add positive admin tests with an isolated seeded admin account before implementing the admin UI.
 5. Add hobbies and learning-interaction regression tests before those methods are wired.
