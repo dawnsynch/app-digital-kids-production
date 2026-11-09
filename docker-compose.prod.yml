@@ -1,0 +1,17 @@
+services:
+  api:
+    image: ${API_IMAGE}
+    restart: unless-stopped
+    env_file: [.env]
+    environment:
+      DATABASE_URL: sqlite:////app/data/digital_kids_assistant.db
+    volumes:
+      - ./data:/app/data
+    ports: ["8000:8000"]
+
+  web:
+    image: ${WEB_IMAGE}
+    restart: unless-stopped
+    depends_on: [api]
+    ports: ["8080:80"]
+

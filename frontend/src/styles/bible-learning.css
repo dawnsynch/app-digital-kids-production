@@ -1,0 +1,1361 @@
+/* ==================== BIBLE LEARNING PAGE ==================== */
+
+.bible {
+  --b-ink: #0f172a;
+  --b-muted: #64748b;
+  --b-line: #e2e8f0;
+  --b-panel: #f8fafc;
+  --b-blue: #2563eb;
+  --b-gold: #f59e0b;
+  --b-green: #10b981;
+  --b-purple: #7c3aed;
+  --b-orange: #ea580c;
+  --b-teal: #0ea5e9;
+  --b-pink: #ec4899;
+  --b-bg: #f8fafc;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------------------------------- hero ---------------------------------- */
+
+.bible__hero {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin-top: 20px;
+  padding: 20px 24px;
+  border-radius: 20px;
+  background: #fff8e1;
+  overflow: hidden;
+}
+
+.bible__hero-badge {
+  width: 56px;
+  height: 60px;
+  flex: none;
+  border-radius: 16px;
+}
+
+.bible__hero-intro {
+  padding-top: 4px;
+  max-width: 440px;
+}
+
+.bible__hero-title {
+  font-size: 34px;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.bible__hero-subtitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+.bible__hero-art {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 49%;
+  height: auto;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ------------------------------ continue card ------------------------------ */
+
+.bible__continue {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 14px;
+  padding: 18px 20px 20px;
+  border-radius: 20px;
+  background: linear-gradient(100deg, #e0f7fa 0%, #e1f5fe 46%, #e3f2fd 100%);
+  overflow: hidden;
+}
+
+.bible__continue-body {
+  position: relative;
+  z-index: 2;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 36%;
+}
+
+.bible__continue-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 16px;
+}
+
+.bible__continue-badge {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--b-gold);
+}
+
+.bible__continue-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+.bible__continue-desc {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.bible__continue-progress {
+  font-family: sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 8px;
+}
+
+.bible__continue-pct {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.bible__continue-pct-value {
+  font-weight: 800;
+  color: #0f172a;
+  margin-right: 3px;
+}
+
+.bible__continue-bar {
+  position: relative;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+  overflow: hidden;
+  margin-top: 14px;
+}
+
+.bible__continue-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #38bdf8;
+}
+
+.bible__continue-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #475569;
+  margin-top: 9px;
+}
+
+.bible__continue-meta-icon {
+  margin-right: 2px;
+}
+
+.bible__continue-lesson {
+  color: #0f172a;
+}
+
+.bible__continue-btn {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  height: 40px;
+  margin-top: 12px;
+  padding: 0 20px;
+  border-radius: 10px;
+  background: #fff;
+  color: #0ea5e9;
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(14, 165, 233, 0.24);
+  transition: filter 0.16s ease, transform 0.16s ease;
+}
+
+.bible__continue-btn:hover {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+}
+
+.bible__continue-art {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 46%;
+  height: auto;
+  pointer-events: none;
+}
+
+/* ------------------------------ verse of day ------------------------------ */
+
+.bible__verse {
+  margin-top: 14px;
+  padding: 16px 20px 16px 14px;
+  border-radius: 18px;
+  background: #f8fafc;
+}
+
+.bible__verse-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.bible__verse-sun {
+  width: 30px;
+  height: 30px;
+  flex: none;
+}
+
+.bible__verse-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.bible__verse-today {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0ea5e9;
+}
+
+.bible__verse-quote {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+
+.bible__verse-ref {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.bible__verse-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bible__verse-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+
+.bible__verse-btn:hover {
+  background: #e2e8f0;
+}
+
+.bible__verse-btn--outline {
+  background: #fff;
+  border: 1.5px solid #0ea5e9;
+  color: #0ea5e9;
+}
+
+.bible__verse-btn--filled {
+  background: #0ea5e9;
+  color: #fff;
+}
+
+.bible__verse-btn-icon {
+  margin-right: 6px;
+}
+
+.bible__verse-art {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 46%;
+  height: auto;
+  pointer-events: none;
+}
+
+/* ------------------------------ skills section ------------------------------ */
+
+.bible__explore {
+  margin-top: 24px;
+}
+
+.bible__section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.bible__section-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.015em;
+}
+
+.bible__section-sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.bible__section-link {
+  font-size: 12px;
+  font-weight: 800;
+  color: #0ea5e9;
+  white-space: nowrap;
+  transition: opacity 0.16s ease;
+}
+
+.bible__section-link:hover {
+  opacity: 0.7;
+}
+
+.bible__skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+/* ---------------------------------- skill card ------------------------------ */
+
+.bible__skill {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--b-line);
+  border-radius: 16px;
+  padding: 13px 13px 12px;
+  min-height: 190px;
+  overflow: hidden;
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.bible__skill:hover {
+  box-shadow: 0 12px 26px rgba(18, 40, 100, 0.09);
+  transform: translateY(-2px);
+}
+
+.bible__skill-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.bible__skill-badge {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 20px;
+}
+
+.bible__skill-intro {
+  min-width: 0;
+  padding-top: 1px;
+}
+
+.bible__skill-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.bible__skill-desc {
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748b;
+  line-height: 1.42;
+  margin-top: 3px;
+  max-width: 84%;
+}
+
+.bible__skill-art {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 116px;
+  pointer-events: none;
+}
+
+.bible__skill-bar {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: #eef1f8;
+  overflow: hidden;
+  margin-top: 8px;
+  max-width: 58%;
+}
+
+.bible__skill-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
+
+.bible__skill-pct {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-top: 5px;
+}
+
+.bible__skill-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #545769;
+  margin-top: 5px;
+}
+
+.bible__skill-btn {
+  height: 30px;
+  margin-top: 8px;
+  padding: 0 18px;
+  border: 1.5px solid #0ea5e9;
+  border-radius: 8px;
+  background: #fff;
+  color: #0ea5e9;
+  font-size: 12.5px;
+  font-weight: 800;
+  transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.bible__skill-btn:hover {
+  background: #0ea5e9;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* -------------------------------- bottom row -------------------------------- */
+
+.bible__bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 14px;
+  margin-top: 16px;
+  align-items: start;
+}
+
+/* ---------------------------- recommended lesson ---------------------------- */
+
+.bible__recommended {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  background: var(--b-panel);
+  border-radius: 18px;
+  padding: 15px 16px 16px;
+  min-height: 210px;
+  overflow: hidden;
+}
+
+.bible__recommended-robot {
+  width: 74px;
+  height: 78px;
+  flex: none;
+  align-self: flex-start;
+  margin-top: 10px;
+}
+
+.bible__recommended-text {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.bible__recommended-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.bible__recommended-course {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-top: 12px;
+}
+
+.bible__recommended-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a5a9c;
+  line-height: 1.45;
+  margin-top: 6px;
+}
+
+.bible__recommended-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #545769;
+  margin-top: 8px;
+}
+
+.bible__recommended-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bible__recommended-points {
+  color: #b8860b;
+}
+
+.bible__recommended-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 20px;
+  height: 38px;
+  margin-top: 12px;
+  padding: 0 18px;
+  border-radius: 10px;
+  background: #0ea5e9;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(14, 165, 233, 0.24);
+  transition: filter 0.16s ease, transform 0.16s ease;
+}
+
+.bible__recommended-btn:hover {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+}
+
+/* ------------------------------- challenge -------------------------------- */
+
+.bible__practice {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--b-line);
+  border-radius: 18px;
+  padding: 14px 14px 12px;
+  min-height: 210px;
+}
+
+.bible__practice-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.bible__practice-sub {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--b-muted);
+  margin-top: 6px;
+}
+
+.bible__practice-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-top: 14px;
+}
+
+.bible__practice-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.bible__practice-bullet {
+  color: #10b981;
+  font-weight: 800;
+}
+
+.bible__practice-btn {
+  height: 38px;
+  margin-top: 12px;
+  padding: 0 18px;
+  border-radius: 10px;
+  background: #22c55e;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(34, 197, 94, 0.24);
+  transition: filter 0.16s ease, transform 0.16s ease;
+}
+
+.bible__practice-btn:hover {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+}
+
+/* -------------------------------- progress -------------------------------- */
+
+.bible__progress {
+  background: #fff;
+  border: 1px solid var(--b-line);
+  border-radius: 18px;
+  padding: 14px 14px 12px;
+  min-height: 210px;
+}
+
+.bible__progress-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.bible__progress-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--b-ink);
+}
+
+.bible__progress-link {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #0ea5e9;
+  white-space: nowrap;
+}
+
+.bible__progress-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.bible__progress-stat {
+  text-align: center;
+}
+
+.bible__progress-stat-value {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--b-ink);
+  margin-top: 3px;
+}
+
+.bible__progress-stat-label {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--b-muted);
+  line-height: 1.25;
+  margin-top: 2px;
+}
+
+.bible__progress-stat-label span {
+  display: block;
+}
+
+.bible__progress-level {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 9px 11px;
+  border-radius: 12px;
+  background: #f4fbf6;
+  border: 1px solid #d8f0e2;
+}
+
+.bible__progress-level-bar {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: #dff2e6;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.bible__progress-level-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #22c55e;
+}
+
+.bible__progress-level-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.bible__progress-level-name {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #1a7f42;
+}
+
+.bible__progress-xp {
+  font-size: 10px;
+  font-weight: 700;
+  color: #4f7a5f;
+  margin-top: 4px;
+}
+
+.bible__progress-next {
+  flex: none;
+  max-width: 96px;
+  text-align: center;
+  font-size: 8.5px;
+  font-weight: 700;
+  color: #6b7f92;
+  background: #fff;
+  border: 1px solid #e3eaf3;
+  border-radius: 9px;
+  padding: 6px 7px;
+  line-height: 1.25;
+}
+
+.bible__progress-next strong {
+  display: block;
+  color: #1f2937;
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+.bible__progress-achievement {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 6px 4px;
+  border-radius: 10px;
+  text-align: left;
+  transition: background 0.16s ease;
+}
+
+.bible__progress-achievement:hover {
+  background: #f7f9fd;
+}
+
+.bible__progress-achievement img {
+  width: 40px;
+  flex: none;
+}
+
+.bible__progress-achievement-img {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(145deg, #f59e0b, #f97316);
+}
+
+.bible__progress-achievement span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.bible__progress-achievement strong {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--b-ink);
+}
+
+.bible__progress-achievement span:nth-child(2) {
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+  color: #1f2937;
+  margin-top: 1px;
+}
+
+.bible__progress-achievement small {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--b-muted);
+  margin-top: 1px;
+}
+
+/* ---------------------------------- responsive ---------------------------------- */
+
+@media (max-width: 1180px) {
+  .bible__skills-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bible__bottom {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bible__progress {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .bible__hero {
+    flex-wrap: wrap;
+  }
+
+  .bible__hero-intro {
+    max-width: none;
+  }
+
+  .bible__hero-art {
+    position: static;
+    order: 3;
+    width: 60%;
+    max-width: 100%;
+    margin-left: auto;
+  }
+
+  .bible__continue {
+    flex-wrap: wrap;
+  }
+
+  .bible__continue__body {
+    max-width: none;
+  }
+
+  .bible__continue__editor {
+    order: 3;
+  }
+
+  .bible__continue__art {
+    position: static;
+    order: 4;
+    width: 100%;
+    max-width: none;
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .bible__skills-grid,
+  .bible__bottom {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bible__progress {
+    grid-column: auto;
+  }
+
+  .bible__hero {
+    padding: 16px;
+  }
+
+  .bible__hero-title {
+    font-size: 24px;
+  }
+
+  .bible__hero-subtitle {
+    font-size: 13px;
+  }
+
+  .bible__hero-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 13px;
+  }
+
+  .bible-continue__title {
+    font-size: 16px;
+  }
+
+  .bible-continue__meta {
+    font-size: 12px;
+  }
+
+  .bible__continue__editor {
+    width: 100%;
+    max-width: 220px;
+  }
+
+  .bible__skill {
+    min-height: 0;
+  }
+
+  .bible__skill__art {
+    width: 88px;
+  }
+
+  .bible__skill__description {
+    max-width: 60%;
+  }
+
+  .bible__recommended {
+    flex-wrap: wrap;
+  }
+
+  .bible__recommended__robot {
+    width: 72px;
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .bible__hero {
+    flex-wrap: wrap;
+  }
+
+  .bible__hero__art {
+    width: 100%;
+  }
+
+  .bible__skill__art {
+    position: static;
+    width: 100%;
+    max-height: 150px;
+    object-fit: contain;
+    margin-top: 10px;
+  }
+
+  .bible__skill__description,
+  .bible__skill__bar {
+    max-width: 100%;
+  }
+
+  .bible__progress__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bible__challenge__foot {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Reference-aligned page grid and card-specific containment. */
+.bible {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.bible__hero,
+.bible__explore,
+.bible__bottom {
+  grid-column: 1 / -1;
+}
+
+.bible__hero {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1.1fr) minmax(280px, 0.9fr);
+  align-items: center;
+  gap: 18px;
+  min-height: 140px;
+  margin-top: 20px;
+  padding: 18px 20px;
+}
+
+.bible__hero-badge {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  color: #fff;
+  background: #f59e0b;
+  box-shadow: 0 8px 18px rgba(245, 158, 11, 0.25);
+}
+
+.bible__hero-title {
+  color: #11155c;
+}
+
+.bible__hero-art {
+  position: static;
+  align-self: stretch;
+  height: 100%;
+  min-height: 104px;
+  width: 100%;
+  object-fit: cover;
+  object-position: 62% center;
+}
+
+.bible__continue {
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(240px, 2fr);
+  align-items: stretch;
+  gap: 16px;
+  min-height: 220px;
+  margin-top: 0;
+  padding: 16px 18px;
+  background: linear-gradient(105deg, #d9efff 0%, #e5edff 54%, #fff1db 100%);
+}
+
+.bible__continue-body {
+  max-width: none;
+  min-width: 0;
+}
+
+.bible__continue-badge {
+  border-radius: 10px;
+}
+
+.bible__continue-bar {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.bible__continue-bar span {
+  background: #22c55e;
+}
+
+.bible__continue-btn {
+  background: #1262f3;
+  color: #fff;
+}
+
+.bible__continue-media {
+  min-width: 0;
+  min-height: 188px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.bible__continue-art {
+  position: static;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: 125% auto;
+}
+
+.bible__verse {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 118px;
+  grid-template-areas:
+    "content media"
+    "actions actions";
+  align-items: stretch;
+  column-gap: 8px;
+  row-gap: 12px;
+  grid-column: span 1;
+  min-width: 0;
+  min-height: 220px;
+  margin-top: 0;
+  padding: 16px;
+  background: #fffaf0;
+  border: 1px solid #f6e5bd;
+  overflow: hidden;
+}
+
+.bible__verse-body {
+  display: contents;
+}
+
+.bible__verse-head {
+  grid-area: content;
+  align-self: start;
+  gap: 8px;
+}
+
+.bible__verse-sun {
+  display: grid;
+  place-items: center;
+  color: #f59e0b;
+}
+
+.bible__verse-quote {
+  grid-area: content;
+  align-self: center;
+  max-width: 60%;
+  font-size: 15px;
+  max-width: none;
+  margin: 42px 0 0;
+}
+
+.bible__verse-actions {
+  grid-area: actions;
+  position: static;
+  gap: 6px;
+}
+
+.bible__verse-btn {
+  height: 32px;
+  padding: 0 8px;
+  font-size: 10px;
+}
+
+.bible__verse-media {
+  grid-area: media;
+  display: flex;
+  align-items: flex-end;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.bible__verse-art {
+  position: static;
+  width: 100%;
+  height: 100%;
+  max-height: 132px;
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: 122% auto;
+}
+
+.bible__explore {
+  margin-top: 0;
+}
+
+.bible__skills-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.bible__skill {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 108px;
+  grid-template-areas:
+    "head art"
+    "bar art"
+    "percent art"
+    "meta art"
+    "button art";
+  grid-template-rows: auto 6px auto auto auto;
+  column-gap: 8px;
+  align-content: start;
+  min-height: 178px;
+}
+
+.bible__skill-head { grid-area: head; min-width: 0; }
+.bible__skill-intro {
+  max-width: none;
+  min-width: 0;
+}
+
+.bible__skill-desc { max-width: none; }
+.bible__skill-media {
+  grid-area: art;
+  align-self: end;
+  justify-self: end;
+  width: 100%;
+  max-width: 108px;
+  height: 126px;
+  max-height: 126px;
+  overflow: hidden;
+}
+.bible__skill-art {
+  position: static;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: 130% bottom;
+  background-size: auto 100%;
+}
+.bible__skill-bar { grid-area: bar; width: 100%; max-width: none; margin-top: 0; }
+.bible__skill-pct { grid-area: percent; }
+.bible__skill-meta { grid-area: meta; }
+.bible__skill-btn { grid-area: button; justify-self: start; }
+
+.bible__recommended {
+  padding-right: 82px;
+}
+
+.bible__recommended-art {
+  position: absolute;
+  right: 2px;
+  bottom: 0;
+  width: 92px;
+  max-height: 126px;
+  object-fit: contain;
+}
+
+.bible__practice {
+  overflow: hidden;
+  padding-right: 104px;
+}
+
+.bible__practice-topic {
+  margin-top: 6px;
+  font-size: 15px;
+  color: var(--b-ink);
+}
+
+.bible__practice-art {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 110px;
+  max-height: 132px;
+  object-fit: contain;
+}
+
+@media (max-width: 1180px) {
+  .bible__skills-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .bible {
+    display: flex;
+    gap: 0;
+  }
+
+  .bible__hero {
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr);
+    min-height: 86px;
+    margin-top: 16px;
+    padding: 12px;
+    flex-wrap: nowrap;
+  }
+
+  .bible__hero-badge {
+    width: 46px;
+    height: 46px;
+  }
+
+  .bible__hero-title {
+    font-size: 21px;
+  }
+
+  .bible__hero-subtitle {
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .bible__hero-art {
+    display: none;
+  }
+
+  .bible__continue {
+    grid-template-columns: minmax(0, 56%) minmax(220px, 44%);
+    min-height: 220px;
+    margin-top: 12px;
+    flex-wrap: nowrap;
+  }
+
+  .bible__continue-body {
+    max-width: none;
+  }
+
+  .bible__continue-media {
+    min-height: 188px;
+  }
+
+  .bible__continue-meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .bible__verse {
+    grid-template-columns: minmax(0, 1fr) 112px;
+    min-height: 198px;
+    margin-top: 12px;
+  }
+
+  .bible__verse-actions {
+    position: static;
+    margin-top: 0;
+  }
+
+  .bible__explore {
+    margin-top: 20px;
+  }
+
+  .bible__skills-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .bible__skill {
+    grid-template-columns: minmax(0, 1fr) 98px;
+    min-height: 116px;
+    padding: 12px;
+  }
+
+  .bible__skill-intro {
+    max-width: none;
+  }
+
+  .bible__skill-desc,
+  .bible__skill-bar {
+    max-width: none;
+  }
+
+.bible__skill-media {
+    width: 98px;
+    height: 108px;
+    max-height: 108px;
+  }
+
+  .bible__recommended {
+    flex-wrap: nowrap;
+    padding-right: 76px;
+  }
+
+  .bible__practice {
+    padding-right: 98px;
+  }
+}
+
+@media (max-width: 620px) {
+  .bible__continue {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .bible__continue-media {
+    min-height: 190px;
+  }
+
+  .bible__continue-art {
+    background-position: right 20%;
+    background-size: 125% auto;
+  }
+}

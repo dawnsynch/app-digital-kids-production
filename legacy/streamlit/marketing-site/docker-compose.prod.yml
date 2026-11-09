@@ -1,0 +1,7 @@
+services:
+  marketing:
+    image: ${MARKETING_IMAGE}
+    container_name: dka-marketing
+    restart: unless-stopped
+    ports:
+      - "8080:80"

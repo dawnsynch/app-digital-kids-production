@@ -1,0 +1,76 @@
+# Backend API contracts
+
+Evidence sources: FastAPI's generated `app.openapi()` document, `backend/app/schemas.py`, route dependencies, and ownership helpers in `backend/app/access.py`. `HTTPBearer` in OpenAPI means a bearer token is required; role and ownership constraints are enforced by Python dependencies and therefore require source inspection in addition to OpenAPI.
+
+Status: **Client** means a typed method exists in `frontend/src/api/client.ts`; **Preview** means a React screen exists but still uses demo/static data; **Missing** means the client method or UI integration does not yet exist.
+
+## Health and authentication
+
+| Method and endpoint | Request → response | Role / ownership | React surface | Status | Required changes | Test coverage |
+| --- | --- | --- | --- | --- | --- | --- |
+| `GET /health` | none → operational health object | Public | Deployment/diagnostic use | Client | Add explicit backend response model so OpenAPI describes diagnostics | Full contract test |
+| `POST /auth/register-parent` | `ParentRegisterRequest` → `TokenResponse` | Public | `/parent/register` | **Integrated** | Phone/consent persistence still requires a separately approved contract | Success, duplicate email, validation, hash non-disclosure |
+| `POST /auth/login` | `LoginRequest` → `TokenResponse` | Public | `/parent/sign-in`; future learner login | **Parent integrated** | Learner PIN still has no matching contract | Valid/invalid parent login and role separation |
+| `GET /auth/me` | none → `UserOut` | Any authenticated active user | Auth bootstrap/role routing | **Integrated** | No Phase 1A contract change required | Valid, missing, invalid, tampered, expired, inactive, all roles, hash exclusion |
+
+## Learner profiles
+
+| Method and endpoint | Request → response | Role / ownership | React surface | Status | Required changes | Test coverage |
+| --- | --- | --- | --- | --- | --- | --- |
+| `GET /students` | none → `StudentOut[]` | Parent sees own children; learner sees only linked student | `/parent/select-learner`, Profile | Client + Preview | Replace `DEMO_LEARNERS`; add loading/empty/error states | Learner single-profile scope tested |
+| `POST /students` | `StudentCreate` → `StudentOut` | Parent only; new row assigned to current parent | Parent learner-management design | Client; no active form | Add only when matching UI flow is approved | Learner denial tested |
+| `GET /students/{student_id}` | path ID → `StudentOut` | Owning parent or linked learner | Profile/learner context | Client method missing | Add typed method when profile wiring begins | Own learner and cross-parent tests |
+| `POST /students/{student_id}/learner-account` | `LearnerAccountCreate` → `UserOut` | Parent only and must own student | Parent learner management | Client; no active form | Define username/password UX; do not substitute the four-digit PIN | Owner and cross-parent denial tested |
+
+## CBC revision, answers, and marking
+
+| Method and endpoint | Request → response | Role / ownership | React surface | Status | Required changes | Test coverage |
+| --- | --- | --- | --- | --- | --- | --- |
+| `GET /revision/options` | none → untyped grades/terms/subjects/difficulty object | Any authenticated user | `/practice`, `/subjects` | Client + Preview | Add backend response schema and load setup options | Authentication exercised indirectly |
+| `POST /revision/generate` | `RevisionGenerateRequest` → `RevisionGenerateResponse` | Owning parent or linked learner for `student_id` | `/practice` | Client + Preview | Bind selected learner and retain returned assessment ID | Parent generation tested |
+| `POST /revision/answers` | `RevisionSubmitRequest` → `RevisionAnswersResponse` | Assessment's owning parent or linked learner | Future quiz screen | Client; UI missing | Save learner answers without triggering marking | Learner save tested |
+| `GET /revision/{assessment_id}` | path ID → untyped assessment detail | Assessment's owning parent or linked learner | Resume/review flow | Client method missing | Add response schema and typed client method | Cross-parent denial tested |
+| `POST /revision/submit` | `RevisionSubmitRequest` → `RevisionSubmitResponse` | Parent only and must own assessment | Parent review/results | Client; UI missing | Ensure learner UI never calls parent-only marking; render feedback/result | Learner denial and parent success tested |
+
+## Learning content
+
+| Method and endpoint | Request → response | Role / ownership | React surface | Status | Required changes | Test coverage |
+| --- | --- | --- | --- | --- | --- | --- |
+| `POST /learning/coding` | `CodingLessonRequest` → `CodingLessonResponse` | Authenticated; learner may request only own grade; parent grade is not ownership-bound | `/coding-technology` | Client + Preview | Connect selected topic and track resulting interaction; consider binding parent request to child in later contract | Learner allowed/blocked grade tested |
+| `POST /learning/spiritual` | `SpiritualLessonRequest` → `SpiritualLessonResponse` | Same grade rule as coding | `/bible-learning` | Client + Preview | Connect selected theme and track interaction | Learner allowed grade tested |
+| `POST /hobbies/activity` | `HobbyActivityRequest` → `HobbyActivityResponse` | Authenticated and must own/link payload student | No current core route | Client missing | Keep out of Phase 1 UI until an approved existing screen is mapped | No Phase 0B regression test |
+
+## Learning interactions and progress
+
+| Method and endpoint | Request → response | Role / ownership | React surface | Status | Required changes | Test coverage |
+| --- | --- | --- | --- | --- | --- | --- |
+| `POST /learning-interactions` | `LearningInteractionCreate` → `LearningInteractionOut` | Authenticated and must own/link student | Coding, Bible, future activities | Client missing | Add typed methods; record only after content generation succeeds | Ownership helper covered indirectly |
+| `GET /learning-interactions/me` | none → `LearningInteractionOut[]` | Learner gets linked student's interactions; parent gets interactions created by that parent | Dashboard/history | Client missing | Confirm parent semantics are desired before use | Not directly covered |
+| `GET /learning-interactions/student/{student_id}` | path ID → `LearningInteractionOut[]` | Owning parent or linked learner | Progress/history | Client missing | Add typed method and empty state | Not directly covered |
+| `PATCH /learning-interactions/{interaction_id}` | `LearningInteractionUpdate` → `LearningInteractionOut` | Owning parent or linked learner | Completion/review actions | Client missing | Define field-level permissions: current code lets either owner role update response, status, and assignment | Not directly covered |
+| `GET /progress/student/{student_id}` | none → `ProgressSummary` | Owning parent or linked learner | `/`, `/progress`, learner profile | Client + Preview | Replace static attempts/progress where fields map directly | Cross-parent denial tested |
+| `GET /progress/summary` | none → untyped parent aggregate | Parent only; query filters all attempts/interactions to parent's children | Parent dashboard designs | Client missing | Add response model/client method before UI wiring | Learner denial tested |
+
+## Administration
+
+All routes below use `require_admin`. There is no React admin route in the current `App.tsx`, although design references exist.
+
+| Method and endpoint | Request → response | Filters | Status | Required changes | Test coverage |
+| --- | --- | --- | --- | --- | --- |
+| `GET /admin/parents` | none → `UserOut[]` | none | Missing | Add admin auth/bootstrap and client only in administration phase | Parent denial tested |
+| `GET /admin/learners` | none → `UserOut[]` | `parent_id` | Missing | Add typed query/response | Role denial only |
+| `GET /admin/students` | untyped array | `parent_id`, `learner_id`, `grade` | Missing | Introduce response schema before client generation | Role denial only |
+| `GET /admin/assessments` | untyped array | parent, learner, grade, subject, date range | Missing | Introduce response schema | Role denial only |
+| `GET /admin/interactions` | untyped array | parent, learner, grade, module, date range | Missing | Introduce response schema | Role denial only |
+| `GET /admin/progress` | untyped array | parent, learner, grade | Missing | Introduce response schema | Role denial only |
+| `GET /admin/summary` | untyped aggregate | none | Missing | Introduce response schema | Parent denial tested; admin success not tested |
+
+## Contract risks and required preparation
+
+1. Add response models for health, revision options/detail, progress summary aggregate, and custom admin rows before generating frontend types from OpenAPI.
+2. Decide learner authentication UX. The backend supports username/password; the React four-digit PIN is demo-only and has no secure API contract.
+3. Define field-level permissions for interaction updates rather than relying only on student ownership.
+4. Add positive admin tests with an isolated seeded admin account before implementing the admin UI.
+5. Add hobbies and learning-interaction regression tests before those methods are wired.
+6. Keep backend 401/403 checks as mandatory integration tests; client-side route guards are not authorization controls.
+

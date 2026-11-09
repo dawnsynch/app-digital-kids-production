@@ -1,0 +1,23 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    restart: unless-stopped
+    env_file: [.env]
+    environment:
+      DATABASE_URL: sqlite:////app/data/digital_kids_assistant.db
+    volumes:
+      - ./data:/app/data
+    ports: ["8000:8000"]
+
+  web:
+    build:
+      context: ./frontend
+      target: production
+      args:
+        VITE_API_BASE_URL: /api
+    restart: unless-stopped
+    depends_on: [api]
+    ports: ["8080:80"]
+
