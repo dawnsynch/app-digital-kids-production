@@ -159,6 +159,8 @@ def test_parent_learner_and_admin_roles_remain_separated(client: TestClient):
         assert "password_hash" not in identity.json()
 
     assert client.get("/admin/summary", headers=_auth_headers(admin_login.json()["access_token"])).status_code == 200
+    assert client.get("/admin/students", headers=_auth_headers(admin_login.json()["access_token"])).status_code == 200
+    assert client.get("/students", headers=_auth_headers(admin_login.json()["access_token"])).status_code == 403
     assert client.post("/students", json={"name": "Denied", "grade": 5}, headers=_auth_headers(learner["access_token"])).status_code == 403
     assert client.post("/students", json={"name": "Denied", "grade": 5}, headers=_auth_headers(admin_login.json()["access_token"])).status_code == 403
 
@@ -171,7 +173,7 @@ def test_parent_and_learner_student_access_is_scoped(client: TestClient):
     parent_b_headers = _auth_headers(parent_b["access_token"])
     learner_headers = _auth_headers(learner["access_token"])
 
-    assert client.get(f"/students/{student['id']}", headers=parent_b_headers).status_code == 403
+    assert client.get(f"/students/{student['id']}", headers=parent_b_headers).status_code == 404
     assert client.get(f"/progress/student/{student['id']}", headers=parent_b_headers).status_code == 403
     assert client.post(
         f"/students/{student['id']}/learner-account",
@@ -265,3 +267,84 @@ def test_invalid_missing_and_parent_only_access_are_rejected(client: TestClient)
     ).status_code == 401
     assert client.get("/admin/summary", headers=_auth_headers(parent["access_token"])).status_code == 403
     assert client.get("/progress/summary", headers=_auth_headers(learner["access_token"])).status_code == 403
+
+
+def test_parent_can_create_list_retrieve_and_update_learner_profiles(client: TestClient):
+    parent = _register_parent(client, "Profile Parent")
+    headers = _auth_headers(parent["access_token"])
+
+    created = client.post(
+        "/students",
+        json={"name": "  Amina Learner  ", "grade": 5, "age_group": " 10-12 "},
+        headers=headers,
+    )
+    assert created.status_code == 200
+    learner = created.json()
+    assert learner["name"] == "Amina Learner"
+    assert learner["age_group"] == "10-12"
+    assert learner["parent_id"] == parent["user"]["id"]
+
+    listed = client.get("/students", headers=headers)
+    assert listed.status_code == 200
+    assert [item["id"] for item in listed.json()] == [learner["id"]]
+    assert client.get(f"/students/{learner['id']}", headers=headers).json() == learner
+
+    updated = client.patch(
+        f"/students/{learner['id']}",
+        json={"name": "Amina Updated", "grade": 6, "age_group": None},
+        headers=headers,
+    )
+    assert updated.status_code == 200
+    assert updated.json() | {"created_at": learner["created_at"]} == {
+        **learner,
+        "name": "Amina Updated",
+        "grade": 6,
+        "age_group": None,
+    }
+    assert updated.json()["parent_id"] == parent["user"]["id"]
+
+
+def test_learner_profile_validation_and_management_roles(client: TestClient):
+    parent_a = _register_parent(client, "Manager Parent A")
+    parent_b = _register_parent(client, "Manager Parent B")
+    student = _create_student(client, parent_a["access_token"])
+    learner = _create_learner_login(client, parent_a["access_token"], student["id"])
+    parent_b_headers = _auth_headers(parent_b["access_token"])
+    learner_headers = _auth_headers(learner["access_token"])
+
+    assert client.post("/students", json={"name": " ", "grade": 5}, headers=parent_b_headers).status_code == 422
+    assert client.post("/students", json={"name": "Valid Name", "grade": 4}, headers=parent_b_headers).status_code == 422
+    assert client.patch(f"/students/{student['id']}", json={}, headers=_auth_headers(parent_a["access_token"])).status_code == 422
+    assert client.patch(f"/students/{student['id']}", json={"grade": 8}, headers=_auth_headers(parent_a["access_token"])).status_code == 422
+    assert client.patch(f"/students/{student['id']}", json={"name": "Blocked"}, headers=parent_b_headers).status_code == 404
+    assert client.patch(f"/students/{student['id']}", json={"name": "Blocked"}, headers=learner_headers).status_code == 403
+
+
+def test_updating_learner_profile_preserves_assessment_link(client: TestClient):
+    parent = _register_parent(client, "Assessment Parent")
+    headers = _auth_headers(parent["access_token"])
+    student = _create_student(client, parent["access_token"], grade=5)
+    assessment = client.post(
+        "/revision/generate",
+        json={
+            "student_id": student["id"],
+            "term": 1,
+            "subject": "Mathematics",
+            "topic": "Numbers",
+            "difficulty": "Easy",
+            "question_count": 1,
+        },
+        headers=headers,
+    )
+    assert assessment.status_code == 200
+
+    assert client.patch(
+        f"/students/{student['id']}",
+        json={"name": "Renamed Learner", "grade": 6},
+        headers=headers,
+    ).status_code == 200
+    progress = client.get(f"/progress/student/{student['id']}", headers=headers)
+    assert progress.status_code == 200
+    assert progress.json()["student"]["name"] == "Renamed Learner"
+    assert progress.json()["student"]["grade"] == 6
+    assert [item["assessment_id"] for item in progress.json()["recent_attempts"]] == [assessment.json()["assessment_id"]]

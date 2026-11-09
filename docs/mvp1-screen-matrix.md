@@ -20,8 +20,8 @@ Status meanings: **Available** = matching backend capability exists; **Partial**
 | --- | --- | --- |
 | Parent registration `/parent/register` | `POST /auth/register-parent` | Backend available; React remains explicit preview. Phone/consent fields are not backend fields. |
 | Parent sign-in `/parent/sign-in` | `POST /auth/login`, `GET /auth/me` | Backend available; React still uses fake demo credentials. |
-| Learner selection `/parent/select-learner` | `GET /students` | Backend available; React data is static. |
-| Learner PIN `/learner/pin` | No PIN endpoint; learner username/password login exists | Gap; do not substitute a contract without product/security approval. |
+| Learner selection `/parent/select-learner` | `GET/POST /students`, `GET/PATCH /students/{id}` | **Integrated in Phase 1B** with real parent-owned data, create/view/edit, loading/empty/error/retry states, and memory-only authorized selection. |
+| Learner PIN `/learner/pin` | No PIN endpoint; learner username/password login exists | Explicit preview only; creates no learner token or protected session. Secure authentication is a separate Phase 1C milestone. |
 | Progress `/progress` | learner progress and parent summary endpoints | Partial; React is static. |
 | Achievements `/achievements` | No achievements endpoint | Gap. |
 | Profile `/profile` | `GET /auth/me`, `GET /students/{id}`; no update endpoint | Read-only partial. |

@@ -17,9 +17,10 @@ Status: **Client** means a typed method exists in `frontend/src/api/client.ts`; 
 
 | Method and endpoint | Request → response | Role / ownership | React surface | Status | Required changes | Test coverage |
 | --- | --- | --- | --- | --- | --- | --- |
-| `GET /students` | none → `StudentOut[]` | Parent sees own children; learner sees only linked student | `/parent/select-learner`, Profile | Client + Preview | Replace `DEMO_LEARNERS`; add loading/empty/error states | Learner single-profile scope tested |
-| `POST /students` | `StudentCreate` → `StudentOut` | Parent only; new row assigned to current parent | Parent learner-management design | Client; no active form | Add only when matching UI flow is approved | Learner denial tested |
-| `GET /students/{student_id}` | path ID → `StudentOut` | Owning parent or linked learner | Profile/learner context | Client method missing | Add typed method when profile wiring begins | Own learner and cross-parent tests |
+| `GET /students` | none → `StudentOut[]` | Parent sees own children; learner sees only linked student; admin denied | `/parent/select-learner`, future Profile | **Integrated** | Reuse selection context for Practice/Progress later | Own list, linked learner, and admin policy tested |
+| `POST /students` | `StudentCreate` → `StudentOut` | Parent only; new row assigned to current parent | `/parent/select-learner` | **Integrated** | No Phase 1B contract change required | Parent success, validation, learner denial tested |
+| `GET /students/{student_id}` | path ID → `StudentOut` | Owning parent or linked learner; cross-parent probe returns 404 | Learner details and selection context | **Integrated** | No Phase 1B contract change required | Own learner and cross-parent concealment tested |
+| `PATCH /students/{student_id}` | `StudentUpdate` → `StudentOut` | Parent only; ownership-filtered; no ownership field accepted | Learner edit dialog | **Integrated (Phase 1B)** | Retain stable IDs and linked records | Own update, validation, role denial, cross-parent concealment, assessment link tested |
 | `POST /students/{student_id}/learner-account` | `LearnerAccountCreate` → `UserOut` | Parent only and must own student | Parent learner management | Client; no active form | Define username/password UX; do not substitute the four-digit PIN | Owner and cross-parent denial tested |
 
 ## CBC revision, answers, and marking

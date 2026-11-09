@@ -16,6 +16,7 @@ import type {
   SpiritualLessonRequest,
   Student,
   StudentCreate,
+  StudentUpdate,
   User,
 } from './types'
 
@@ -81,6 +82,9 @@ export class ApiClient {
   currentUser = () => this.request<User>('/auth/me')
   listStudents = () => this.request<Student[]>('/students')
   createStudent = (payload: StudentCreate) => this.request<Student>('/students', { method: 'POST', body: payload })
+  getStudent = (studentId: number) => this.request<Student>(`/students/${studentId}`)
+  updateStudent = (studentId: number, payload: StudentUpdate) =>
+    this.request<Student>(`/students/${studentId}`, { method: 'PATCH', body: payload })
   createLearnerAccount = (studentId: number, payload: LearnerAccountCreate) =>
     this.request<User>(`/students/${studentId}/learner-account`, { method: 'POST', body: payload })
   revisionOptions = () => this.request<RevisionOptions>('/revision/options')

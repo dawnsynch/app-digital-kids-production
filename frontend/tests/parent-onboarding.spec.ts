@@ -126,7 +126,7 @@ test.describe('Phase 1A parent authentication', () => {
     for (const [index, digit] of ['9', '9', '9', '9'].entries()) {
       await page.getByLabel(`PIN digit ${index + 1}`).fill(digit)
     }
-    await page.getByRole('button', { name: /^Continue/ }).click()
+    await page.getByRole('button', { name: 'Preview PIN Check' }).click()
     await expect(page.getByText('That demo PIN is not correct. Use 1234.')).toBeVisible()
   })
 })

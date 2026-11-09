@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from ..access import ensure_student_access
 from ..database import get_db
 from ..models import Student, User
-from ..schemas import LearnerAccountCreate, StudentCreate, StudentOut, UserOut
-from ..security import LEARNER_ROLE, get_current_user, hash_password, require_parent
+from ..schemas import LearnerAccountCreate, StudentCreate, StudentOut, StudentUpdate, UserOut
+from ..security import LEARNER_ROLE, PARENT_ROLE, get_current_user, hash_password, require_parent
 
 router = APIRouter(prefix="/students", tags=["students"])
 
@@ -18,7 +18,7 @@ def create_student(
 ):
     student = Student(
         parent_id=current_user.id,
-        name=payload.name.strip(),
+        name=payload.name,
         grade=payload.grade,
         age_group=payload.age_group,
     )
@@ -38,6 +38,8 @@ def list_students(
             return []
         student = db.get(Student, current_user.student_id)
         return [student] if student else []
+    if current_user.role != PARENT_ROLE:
+        raise HTTPException(status_code=403, detail="Parent or linked learner access required")
     return db.scalars(
         select(Student)
         .where(Student.parent_id == current_user.id)
@@ -51,7 +53,30 @@ def get_student(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    if current_user.role == PARENT_ROLE:
+        student = db.scalar(select(Student).where(Student.id == student_id, Student.parent_id == current_user.id))
+        if not student:
+            raise HTTPException(status_code=404, detail="Student not found")
+        return student
     return ensure_student_access(db, current_user, student_id)
+
+
+@router.patch("/{student_id}", response_model=StudentOut)
+def update_student(
+    student_id: int,
+    payload: StudentUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_parent),
+):
+    student = db.scalar(select(Student).where(Student.id == student_id, Student.parent_id == current_user.id))
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    for field in payload.model_fields_set:
+        setattr(student, field, getattr(payload, field))
+    db.commit()
+    db.refresh(student)
+    return student
 
 
 @router.post("/{student_id}/learner-account", response_model=UserOut)

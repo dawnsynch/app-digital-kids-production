@@ -4,7 +4,7 @@ Consolidated Phase 1 repository containing the existing FastAPI MVP and the exis
 
 ## Status
 
-**Phase 1A recommendation: CONDITIONAL GO for Phase 1B learner-profile integration; NO GO for production or new learning modules.** Parent registration, login, verified identity, protected parent routing, and logout are integrated. The in-memory access token intentionally requires sign-in again after a full refresh. See the [Phase 1A report](docs/mvp1-integration/phase1a-parent-authentication.md).
+**Phase 1B recommendation: CONDITIONAL GO for Phase 1C secure learner authentication; NO GO for production or new learning modules.** Authenticated parents can create, list, view, edit, and select only their own learner profiles. Selection is memory-only and is not learner authentication; the PIN screen remains a non-authorizing preview. See the [Phase 1B report](docs/mvp1-integration/phase1b-learner-profiles.md).
 
 ## Repository layout
 
@@ -123,6 +123,7 @@ python3 scripts/sqlite_backup.py \
 - [CI/CD quality gates](docs/mvp1-integration/07-quality-gates.md)
 - [GO / NO-GO assessment](docs/mvp1-integration/08-go-no-go-assessment.md)
 - [Phase 1A parent authentication](docs/mvp1-integration/phase1a-parent-authentication.md)
+- [Phase 1B learner profiles](docs/mvp1-integration/phase1b-learner-profiles.md)
 
 New learning-module development remains out of scope until the existing MVP screens are integrated and accepted.
 

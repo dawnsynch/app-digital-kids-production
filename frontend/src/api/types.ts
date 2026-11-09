@@ -43,6 +43,12 @@ export interface StudentCreate {
   age_group?: string
 }
 
+export interface StudentUpdate {
+  name?: string
+  grade?: 5 | 6 | 7
+  age_group?: string | null
+}
+
 export interface LearnerAccountCreate {
   full_name?: string
   username: string

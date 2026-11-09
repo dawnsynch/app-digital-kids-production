@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class ParentRegisterRequest(BaseModel):
@@ -51,6 +51,46 @@ class StudentCreate(BaseModel):
     name: str = Field(..., min_length=2, max_length=120)
     grade: int = Field(..., ge=5, le=7)
     age_group: str | None = Field(default=None, max_length=50)
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, value: str) -> str:
+        normalized = value.strip()
+        if len(normalized) < 2:
+            raise ValueError("Learner name must contain at least 2 characters")
+        return normalized
+
+    @field_validator("age_group")
+    @classmethod
+    def normalize_age_group(cls, value: str | None) -> str | None:
+        return value.strip() or None if value is not None else None
+
+
+class StudentUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=2, max_length=120)
+    grade: int | None = Field(default=None, ge=5, le=7)
+    age_group: str | None = Field(default=None, max_length=50)
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        normalized = value.strip()
+        if len(normalized) < 2:
+            raise ValueError("Learner name must contain at least 2 characters")
+        return normalized
+
+    @field_validator("age_group")
+    @classmethod
+    def normalize_age_group(cls, value: str | None) -> str | None:
+        return value.strip() or None if value is not None else None
+
+    @model_validator(mode="after")
+    def require_update_field(self):
+        if not self.model_fields_set:
+            raise ValueError("At least one learner profile field is required")
+        return self
 
 
 class StudentOut(BaseModel):
