@@ -4,10 +4,11 @@ import { StopwatchIcon } from '../icons/Icons'
 type Props = {
   value: number
   onChange: (count: number) => void
+  options?: number[]
 }
 
 /** Step 6 — how many questions the practice should contain. */
-export default function QuestionCountPicker({ value, onChange }: Props) {
+export default function QuestionCountPicker({ value, onChange, options = QUESTION_COUNTS }: Props) {
   return (
     <section className="practice-card">
       <div className="practice-card__head">
@@ -16,7 +17,7 @@ export default function QuestionCountPicker({ value, onChange }: Props) {
       </div>
 
       <div className="questions__options" role="radiogroup" aria-label="Number of questions">
-        {QUESTION_COUNTS.map((count) => {
+        {options.map((count) => {
           const isSelected = count === value
           return (
             <button

@@ -5,10 +5,12 @@ import { MATH_OVERVIEW, MATH_RECOMMENDED_STRAND, MATH_STRANDS } from '../data/ma
 import { useUI } from '../components/ui/UIContext'
 import MathProgressRing from '../components/mathematics/MathProgressRing'
 import MathStrandCard from '../components/mathematics/MathStrandCard'
+import { useAuth } from '../auth/AuthContext'
 
 export default function MathematicsPage() {
   const { notify } = useUI()
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   return (
     <div className="math">
@@ -80,7 +82,8 @@ export default function MathematicsPage() {
           className="math__recommend-btn"
           onClick={() => {
             notify(`Opening ${MATH_RECOMMENDED_STRAND} practice…`, 'success')
-            navigate('/practice')
+            const prefix = user?.role === 'learner' ? '/learner' : ''
+            navigate(`${prefix}/practice?subject=Mathematics&strand=${encodeURIComponent(MATH_RECOMMENDED_STRAND)}`)
           }}
         >
           Practice {MATH_RECOMMENDED_STRAND}

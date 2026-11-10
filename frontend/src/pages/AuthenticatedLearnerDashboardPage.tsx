@@ -31,7 +31,7 @@ export default function AuthenticatedLearnerDashboardPage() {
           <div>
             <span>Verified learner session</span>
             <strong>{identity.learner.name} · Grade {identity.learner.grade}</strong>
-            <small>Dashboard learning cards remain preview content until Phase 2A integration.</small>
+            <small>Practice, Subjects and Mathematics are connected to your secure learner session.</small>
           </div>
         ) : <span>{error || 'Verifying learner identity…'}</span>}
         <button type="button" onClick={() => void signOut()}>Learner Sign Out</button>

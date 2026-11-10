@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import type { Subject } from '../../data/subjects'
 import { ArrowRightIcon, BookIcon } from '../icons/Icons'
 import { useUI } from '../ui/UIContext'
+import { useAuth } from '../../auth/AuthContext'
 
 type Props = {
   subject: Subject
@@ -11,13 +12,15 @@ type Props = {
 export default function SubjectCard({ subject }: Props) {
   const { notify } = useUI()
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const prefix = user?.role === 'learner' ? '/learner' : ''
 
   const name = subject.nameLines.join(' ')
 
   /** Subjects with a detail page open it; the rest report their progress. */
   const openSubject = () => {
     if (subject.detailPath) {
-      navigate(subject.detailPath)
+      navigate(`${prefix}${subject.detailPath}`)
       return
     }
     notify(`${name}: ${subject.progress}% complete · ${subject.lessons} lessons`)
@@ -25,7 +28,7 @@ export default function SubjectCard({ subject }: Props) {
 
   const startPractice = () => {
     notify(`Opening ${name} practice…`, 'success')
-    navigate('/practice')
+    navigate(`${prefix}/practice?subject=${encodeURIComponent(name)}`)
   }
 
   return (

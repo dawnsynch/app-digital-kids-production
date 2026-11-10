@@ -20,6 +20,7 @@ import ParentSelectLearnerPage from './pages/ParentSelectLearnerPage'
 import ParentSignInPage from './pages/ParentSignInPage'
 import { LearnerRoute, ParentRoute, PublicParentRoute } from './auth/AuthRoutes'
 import AuthenticatedLearnerDashboardPage from './pages/AuthenticatedLearnerDashboardPage'
+import PracticeQuestionPage from './pages/PracticeQuestionPage'
 
 export default function App() {
   return (
@@ -42,6 +43,10 @@ export default function App() {
         <Route element={<LearnerRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/learner/dashboard" element={<AuthenticatedLearnerDashboardPage />} />
+            <Route path="/learner/practice" element={<PracticePage />} />
+            <Route path="/learner/practice/:assessmentId" element={<PracticeQuestionPage />} />
+            <Route path="/learner/subjects" element={<ChooseSubjectsPage />} />
+            <Route path="/learner/subjects/mathematics" element={<MathematicsPage />} />
           </Route>
         </Route>
         <Route element={<AppLayout />}>

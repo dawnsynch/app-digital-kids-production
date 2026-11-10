@@ -7,6 +7,9 @@ import type {
   LearnerAccessStatus,
   LearnerHandoff,
   LearnerIdentity,
+  LearnerPracticeAssessment,
+  LearnerPracticeGenerateRequest,
+  LearnerPracticeOptions,
   LoginCredentials,
   ParentRegistration,
   ProgressSummary,
@@ -102,6 +105,11 @@ export class ApiClient {
     this.request<AuthToken>('/auth/learner/redeem', { method: 'POST', body: { challenge, pin } })
   learnerIdentity = () => this.request<LearnerIdentity>('/auth/learner/me')
   learnerLogout = () => this.request<null>('/auth/learner/logout', { method: 'POST' })
+  learnerPracticeOptions = () => this.request<LearnerPracticeOptions>('/revision/learner/options')
+  generateLearnerPractice = (payload: LearnerPracticeGenerateRequest) =>
+    this.request<LearnerPracticeAssessment>('/revision/learner/generate', { method: 'POST', body: payload })
+  learnerPracticeAssessment = (assessmentId: number) =>
+    this.request<LearnerPracticeAssessment>(`/revision/learner/${assessmentId}`)
   revisionOptions = () => this.request<RevisionOptions>('/revision/options')
   generateRevision = (payload: RevisionGenerateRequest) => this.request<RevisionAssessment>('/revision/generate', { method: 'POST', body: payload })
   saveRevisionAnswers = (assessmentId: number, answers: RevisionAnswer[]) =>

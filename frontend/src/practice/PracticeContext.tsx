@@ -1,0 +1,115 @@
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { ApiError, apiClient } from '../api/client'
+import type { LearnerPracticeAssessment, LearnerPracticeGenerateRequest, LearnerPracticeOptions } from '../api/types'
+import { useAuth } from '../auth/AuthContext'
+
+type PracticeContextValue = {
+  options: LearnerPracticeOptions | null
+  assessment: LearnerPracticeAssessment | null
+  drafts: Record<number, string>
+  loading: boolean
+  error: string
+  loadOptions: () => Promise<LearnerPracticeOptions>
+  generate: (payload: Omit<LearnerPracticeGenerateRequest, 'request_id'>) => Promise<LearnerPracticeAssessment>
+  loadAssessment: (assessmentId: number) => Promise<LearnerPracticeAssessment>
+  setDraft: (questionId: number, answer: string) => void
+  clear: () => void
+}
+
+const PracticeContext = createContext<PracticeContextValue | null>(null)
+
+function friendlyError(error: unknown) {
+  if (!(error instanceof ApiError)) return 'Practice is unavailable. Check your connection and try again.'
+  if (error.status === 401) return 'Your learner session has expired. Please sign in again.'
+  if (error.status === 429) return 'You have reached the practice generation limit. Please try again later.'
+  if (error.status === 503) return 'Questions could not be prepared safely. Please try again.'
+  return error.status >= 500 ? 'Practice is temporarily unavailable. Please try again.' : error.message
+}
+
+export function PracticeProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth()
+  const identity = user?.role === 'learner' ? `${user.id}:${user.student_id}` : 'anonymous'
+  const [options, setOptions] = useState<LearnerPracticeOptions | null>(null)
+  const [assessment, setAssessment] = useState<LearnerPracticeAssessment | null>(null)
+  const [drafts, setDrafts] = useState<Record<number, string>>({})
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const requestId = useRef<string | null>(null)
+
+  const clear = useCallback(() => {
+    setOptions(null)
+    setAssessment(null)
+    setDrafts({})
+    setError('')
+    requestId.current = null
+  }, [])
+
+  useEffect(() => clear(), [identity, clear])
+
+  const loadOptions = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const value = await apiClient.learnerPracticeOptions()
+      setOptions(value)
+      return value
+    } catch (caught) {
+      const message = friendlyError(caught)
+      setError(message)
+      throw caught
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const generate = useCallback(async (payload: Omit<LearnerPracticeGenerateRequest, 'request_id'>) => {
+    if (loading) throw new Error('Practice generation is already in progress')
+    requestId.current ||= crypto.randomUUID().replace(/-/g, '')
+    const idempotencyKey = requestId.current
+    setLoading(true)
+    setError('')
+    try {
+      const value = await apiClient.generateLearnerPractice({ ...payload, request_id: idempotencyKey })
+      setAssessment(value)
+      setDrafts({})
+      requestId.current = null
+      return value
+    } catch (caught) {
+      setError(friendlyError(caught))
+      throw caught
+    } finally {
+      setLoading(false)
+    }
+  }, [loading])
+
+  const loadAssessment = useCallback(async (assessmentId: number) => {
+    setLoading(true)
+    setError('')
+    try {
+      const value = await apiClient.learnerPracticeAssessment(assessmentId)
+      setAssessment(value)
+      return value
+    } catch (caught) {
+      setError(friendlyError(caught))
+      throw caught
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const setDraft = useCallback((questionId: number, answer: string) => {
+    setDrafts((current) => ({ ...current, [questionId]: answer }))
+  }, [])
+
+  const value = useMemo(() => ({
+    options, assessment, drafts, loading, error, loadOptions, generate, loadAssessment, setDraft, clear,
+  }), [options, assessment, drafts, loading, error, loadOptions, generate, loadAssessment, setDraft, clear])
+
+  return <PracticeContext.Provider value={value}>{children}</PracticeContext.Provider>
+}
+
+export function usePractice() {
+  const value = useContext(PracticeContext)
+  if (!value) throw new Error('usePractice must be used inside <PracticeProvider>')
+  return value
+}

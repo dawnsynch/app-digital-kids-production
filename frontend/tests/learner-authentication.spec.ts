@@ -1,6 +1,6 @@
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test'
 
-const apiBase = 'http://127.0.0.1:8000'
+const apiBase = 'http://127.0.0.1:8010'
 const learnerPin = '246810'
 
 function uniqueParent(label: string) {
@@ -74,7 +74,7 @@ test.describe('Phase 1C secure learner authentication', () => {
     await expect(page).toHaveURL(/\/learner\/dashboard$/)
     await expect(page.getByText('Secure Learner · Grade 5')).toBeVisible()
     await expect(page.getByText('Verified learner session').first()).toBeVisible()
-    await expect(page.getByText(/preview content until Phase 2A/)).toBeVisible()
+    await expect(page.getByText(/Practice, Subjects and Mathematics are connected/)).toBeVisible()
     if (process.env.CAPTURE_LEARNER_AUTH_SCREENSHOTS === 'true') {
       await page.screenshot({ path: `/tmp/digital-kids-phase1c-${testInfo.project.name}.png`, fullPage: true })
     }

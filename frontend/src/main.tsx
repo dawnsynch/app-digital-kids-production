@@ -4,15 +4,18 @@ import App from './App'
 import { UIProvider } from './components/ui/UIContext'
 import { AuthProvider } from './auth/AuthContext'
 import { LearnerSessionBoundary } from './learners/LearnerSelectionContext'
+import { PracticeProvider } from './practice/PracticeContext'
 import './styles/index.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <UIProvider>
       <AuthProvider>
-        <LearnerSessionBoundary>
-          <App />
-        </LearnerSessionBoundary>
+        <PracticeProvider>
+          <LearnerSessionBoundary>
+            <App />
+          </LearnerSessionBoundary>
+        </PracticeProvider>
       </AuthProvider>
     </UIProvider>
   </StrictMode>,

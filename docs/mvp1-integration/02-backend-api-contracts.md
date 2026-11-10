@@ -32,6 +32,16 @@ Status: **Client** means a typed method exists in `frontend/src/api/client.ts`; 
 
 ## CBC revision, answers, and marking
 
+Phase 2A adds learner-specific contracts that derive ownership and grade from the active learner session and exclude all answer keys and rubrics:
+
+| Endpoint | Request → response | Authorization | React consumer | Status |
+|---|---|---|---|---|
+| `GET /revision/learner/options` | none → `LearnerPracticeOptions` | Active learner only | `/learner/practice`, Subjects, Mathematics | **Integrated Phase 2A** |
+| `POST /revision/learner/generate` | `LearnerPracticeGenerateRequest` → `LearnerPracticeAssessment` | Active learner; identity/grade server-derived | Practice setup | **Integrated Phase 2A** |
+| `GET /revision/learner/{assessment_id}` | path ID → `LearnerPracticeAssessment` | Owning active learner | Question player/direct resume | **Integrated Phase 2A** |
+
+The existing generic generate/detail routes are parent-only as of Phase 2A because their internal model includes marking material. `POST /revision/submit` remains parent-only. `POST /revision/answers` is retained but intentionally not wired during Phase 2A.
+
 | Method and endpoint | Request → response | Role / ownership | React surface | Status | Required changes | Test coverage |
 | --- | --- | --- | --- | --- | --- | --- |
 | `GET /revision/options` | none → untyped grades/terms/subjects/difficulty object | Any authenticated user | `/practice`, `/subjects` | Client + Preview | Add backend response schema and load setup options | Authentication exercised indirectly |

@@ -142,6 +142,43 @@ export interface RevisionResult {
   }>
 }
 
+export interface LearnerPracticeOptions {
+  learner_name: string
+  grade: 5 | 6 | 7
+  terms: Array<1 | 2 | 3>
+  subjects: Array<{ name: string; strands: string[] }>
+  difficulty: Array<'Easy' | 'Medium' | 'Hard'>
+  question_counts: number[]
+}
+
+export interface LearnerPracticeGenerateRequest {
+  request_id: string
+  term: 1 | 2 | 3
+  subject: string
+  strand: string
+  difficulty: 'Easy' | 'Medium' | 'Hard'
+  question_count: number
+}
+
+export interface LearnerPracticeQuestion {
+  id: number
+  question: string
+  marks: number
+  skill_tested: string
+  question_type: string
+}
+
+export interface LearnerPracticeAssessment {
+  assessment_id: number
+  grade: 5 | 6 | 7
+  term: 1 | 2 | 3
+  subject: string
+  strand: string
+  difficulty: 'Easy' | 'Medium' | 'Hard'
+  status: 'ready'
+  questions: LearnerPracticeQuestion[]
+}
+
 export interface CodingLessonRequest {
   grade: 5 | 6 | 7
   topic: string

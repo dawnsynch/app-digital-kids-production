@@ -4,7 +4,7 @@ Consolidated Phase 1 repository containing the existing FastAPI MVP and the exis
 
 ## Status
 
-**Phase 1C recommendation: CONDITIONAL GO for Phase 2A CBC Practice integration; NO GO for production.** Owning parents can configure/reset/disable a hashed learner PIN, issue a short-lived single-use handoff, and establish a learner-scoped, expiring, server-revocable session. Parent and learner tokens remain memory-only and mutually isolated. See the [Phase 1C report](docs/mvp1-integration/phase1c-secure-learner-authentication.md).
+**Phase 2A recommendation: CONDITIONAL GO for Phase 2B answer submission and parent marking integration; NO GO for production.** Authenticated learners can configure backend-supported CBC practice, generate/retrieve learner-scoped questions, and retain in-memory drafts while navigating the responsive player. Learner APIs never return answer keys or marking rubrics, and marking remains parent-only. See the [Phase 2A report](docs/mvp1-integration/phase2a-cbc-practice.md).
 
 ## Repository layout
 
@@ -57,6 +57,8 @@ npm run dev
 Vite proxies `/api/*` to the API and removes the `/api` prefix. Set `VITE_API_BASE_URL` to an absolute API URL when a proxy is not used. FastAPI CORS allows the Vite and legacy Streamlit local origins by default and can be overridden with `ALLOWED_ORIGINS`.
 
 The default configuration uses mock AI. Set a real `OPENAI_API_KEY` and explicitly disable `MOCK_AI_MODE` only when intended. Never commit `.env`.
+
+After a parent configures a learner PIN and completes the handoff, the protected Phase 2A routes are `/learner/practice`, `/learner/subjects`, and `/learner/subjects/mathematics`. Practice options and grade come from the authenticated learner API; draft answers remain in browser memory and are not submitted or marked.
 
 ### Legacy Streamlit reference
 
@@ -126,6 +128,7 @@ python3 scripts/sqlite_backup.py \
 - [Phase 1A parent authentication](docs/mvp1-integration/phase1a-parent-authentication.md)
 - [Phase 1B learner profiles](docs/mvp1-integration/phase1b-learner-profiles.md)
 - [Phase 1C secure learner authentication](docs/mvp1-integration/phase1c-secure-learner-authentication.md)
+- [Phase 2A CBC practice integration](docs/mvp1-integration/phase2a-cbc-practice.md)
 
-New learning-module development remains out of scope until the existing MVP screens are integrated and accepted.
+Phase 2B must not begin until the Phase 2A conditional-GO dependencies in the integration report are accepted.
 

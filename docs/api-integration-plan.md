@@ -8,7 +8,7 @@
 - in-memory bearer-token attachment via `setAccessToken`;
 - JSON serialization and typed responses;
 - a consistent `ApiError` containing HTTP status and backend detail;
-- typed methods for health, auth, students, learner accounts, revision, coding, spiritual lessons, and learner progress.
+- typed methods for health, auth, students, learner accounts, learner-safe CBC practice, legacy revision, coding, spiritual lessons, and learner progress.
 
 Contracts live in `frontend/src/api/types.ts`. Components should import directly from these two modules; UI components should not call `fetch` themselves.
 
@@ -26,7 +26,7 @@ Contracts live in `frontend/src/api/types.ts`. Components should import directly
 1. Add an auth/session context that owns the in-memory access token and calls `apiClient.setAccessToken`. Decide persistence and logout behavior before storing tokens in browser storage.
 2. Replace parent registration and sign-in preview submission with `registerParent` and `login`; retain validation and visual design.
 3. Replace demo learner selection with `listStudents`, then add the existing backend student/account operations where the UI already has a matching flow.
-4. Wire Practice to revision options, generation, answer saving, and parent-only marking while preserving backend role checks.
+4. **Phase 2A complete:** Practice, Subjects, and Mathematics use learner-scoped options, generation, and retrieval. Answer saving and parent-only marking remain Phase 2B scope.
 5. Wire Coding & Technology and Bible Learning to their existing lesson endpoints and record interactions with the existing interaction API.
 6. Wire Home, Progress, and Achievements to progress summary data. Do not manufacture backend metrics that do not exist.
 7. Add contract tests around error states, expired tokens, forbidden cross-parent access, and mock-AI mode.

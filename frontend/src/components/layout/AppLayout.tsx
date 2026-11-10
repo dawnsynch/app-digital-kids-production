@@ -6,6 +6,7 @@ import Header from './Header'
 import MobileBottomNav from './MobileBottomNav'
 import MobileTopBar from './MobileTopBar'
 import Sidebar from './Sidebar'
+import { useAuth } from '../../auth/AuthContext'
 
 /**
  * The shared application shell: sidebar, header, routed page content and the
@@ -15,27 +16,30 @@ export default function AppLayout() {
   const { notify } = useUI()
   const location = useLocation()
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const learnerPrefix = user?.role === 'learner' ? '/learner' : ''
   const [navOpen, setNavOpen] = useState(false)
 
-  const active = location.pathname.startsWith('/learn')
+  const activePath = location.pathname.replace(/^\/learner/, '') || '/'
+  const active = activePath.startsWith('/learn')
     ? 'learn'
-    : location.pathname.startsWith('/practice')
+    : activePath.startsWith('/practice')
       ? 'practice'
-      : location.pathname.startsWith('/coding-technology')
+      : activePath.startsWith('/coding-technology')
         ? 'coding'
-        : location.pathname.startsWith('/bible-learning')
+        : activePath.startsWith('/bible-learning')
           ? 'bible'
-          : location.pathname.startsWith('/subjects')
+          : activePath.startsWith('/subjects')
             ? 'subjects'
-            : location.pathname.startsWith('/achievements')
+            : activePath.startsWith('/achievements')
               ? 'achievements'
-              : location.pathname.startsWith('/progress')
+              : activePath.startsWith('/progress')
                 ? 'progress'
-                : location.pathname.startsWith('/profile')
+                : activePath.startsWith('/profile')
                   ? 'profile'
-                  : location.pathname.startsWith('/help')
+                  : activePath.startsWith('/help')
                     ? 'help'
-                    : location.pathname.startsWith('/settings')
+                    : activePath.startsWith('/settings')
                       ? 'settings'
             : 'home'
 
@@ -50,7 +54,7 @@ export default function AppLayout() {
 
   const select = (id: string, label: string) => {
     if (id === 'home') {
-      navigate('/')
+      navigate(user?.role === 'learner' ? '/learner/dashboard' : '/')
       return
     }
     if (id === 'learn') {
@@ -58,11 +62,11 @@ export default function AppLayout() {
       return
     }
     if (id === 'practice') {
-      navigate('/practice')
+      navigate(`${learnerPrefix}/practice`)
       return
     }
     if (id === 'subjects') {
-      navigate('/subjects')
+      navigate(`${learnerPrefix}/subjects`)
       return
     }
     if (id === 'coding') {

@@ -99,6 +99,8 @@ class AssessmentAttempt(Base):
     result_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     score: Mapped[float | None] = mapped_column(Float, nullable=True)
     total_marks: Mapped[float | None] = mapped_column(Float, nullable=True)
+    request_id: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True, index=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="ready", index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
     student: Mapped[Student] = relationship(back_populates="attempts")

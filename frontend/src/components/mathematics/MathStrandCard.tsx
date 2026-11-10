@@ -1,6 +1,8 @@
 import type { MathStrand } from '../../data/mathematicsContent'
 import { ArrowRightIcon, BookIcon, PencilIcon } from '../icons/Icons'
 import { useUI } from '../ui/UIContext'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../auth/AuthContext'
 
 type Props = {
   strand: MathStrand
@@ -9,6 +11,8 @@ type Props = {
 /** A Mathematics strand tile: badge, progress, counts and a call to action. */
 export default function MathStrandCard({ strand }: Props) {
   const { notify } = useUI()
+  const navigate = useNavigate()
+  const { user } = useAuth()
 
   return (
     <article
@@ -51,9 +55,11 @@ export default function MathStrandCard({ strand }: Props) {
       <button
         type="button"
         className="strand-card__btn"
-        onClick={() =>
-          notify(`${strand.action} — ${strand.name}: ${strand.progress}% complete`, 'success')
-        }
+        onClick={() => {
+          notify(`Opening ${strand.name} practice…`, 'success')
+          const prefix = user?.role === 'learner' ? '/learner' : ''
+          navigate(`${prefix}/practice?subject=Mathematics&strand=${encodeURIComponent(strand.name)}`)
+        }}
       >
         {strand.action}
         <ArrowRightIcon size={19} />

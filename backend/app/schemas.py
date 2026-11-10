@@ -170,6 +170,50 @@ class RevisionGenerateResponse(BaseModel):
     questions: list[RevisionQuestion]
 
 
+class LearnerPracticeSubject(BaseModel):
+    name: str
+    strands: list[str]
+
+
+class LearnerPracticeOptions(BaseModel):
+    learner_name: str
+    grade: int
+    terms: list[int]
+    subjects: list[LearnerPracticeSubject]
+    difficulty: list[str]
+    question_counts: list[int]
+
+
+class LearnerPracticeGenerateRequest(BaseModel):
+    request_id: str = Field(..., min_length=16, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
+    term: int = Field(..., ge=1, le=3)
+    subject: str = Field(..., min_length=2, max_length=120)
+    strand: str = Field(..., min_length=2, max_length=200)
+    difficulty: str = Field(default="Medium", pattern="^(Easy|Medium|Hard)$")
+    question_count: int = Field(default=5, ge=1, le=10)
+
+    model_config = {"extra": "forbid"}
+
+
+class LearnerPracticeQuestion(BaseModel):
+    id: int
+    question: str
+    marks: int
+    skill_tested: str
+    question_type: str = "text"
+
+
+class LearnerPracticeAssessment(BaseModel):
+    assessment_id: int
+    grade: int
+    term: int
+    subject: str
+    strand: str
+    difficulty: str
+    status: str
+    questions: list[LearnerPracticeQuestion]
+
+
 class AnswerItem(BaseModel):
     question_id: int
     answer: str = Field(..., max_length=2000)

@@ -6,6 +6,7 @@ import { join } from 'node:path'
 const e2eDirectory = mkdtempSync(join(tmpdir(), 'digital-kids-playwright-'))
 const databaseUrl = `sqlite:///${join(e2eDirectory, 'e2e.db')}`
 const python = process.env.PYTHON_EXECUTABLE || 'python3'
+const apiPort = 8010
 
 export default defineConfig({
   testDir: './tests',
@@ -30,8 +31,8 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: `cd .. && ${python} -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000`,
-      url: 'http://127.0.0.1:8000/health',
+      command: `cd .. && ${python} -m uvicorn backend.app.main:app --host 127.0.0.1 --port ${apiPort}`,
+      url: `http://127.0.0.1:${apiPort}/health`,
       reuseExistingServer: false,
       timeout: 120000,
       env: {
@@ -46,7 +47,7 @@ export default defineConfig({
       url: 'http://localhost:5173/parent/sign-in',
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
-      env: { VITE_API_PROXY_TARGET: 'http://127.0.0.1:8000' },
+      env: { VITE_API_PROXY_TARGET: `http://127.0.0.1:${apiPort}` },
     },
   ],
 })
