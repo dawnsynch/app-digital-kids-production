@@ -72,6 +72,11 @@ def test_learner_options_generation_idempotency_and_safe_retrieval(client: TestC
     assert client.get(f"/revision/{first.json()['assessment_id']}", headers=learner_headers).status_code == 403
     answers = [{"question_id": item["id"], "answer": "draft"} for item in first.json()["questions"]]
     assert client.post("/revision/submit", json={"assessment_id": first.json()["assessment_id"], "answers": answers}, headers=learner_headers).status_code == 403
+    assert client.post(
+        f"/revision/learner/{first.json()['assessment_id']}/submit",
+        json={"request_id": "submission_123456789", "answers": answers},
+        headers=learner_headers,
+    ).status_code == 200
     assert client.post("/revision/submit", json={"assessment_id": first.json()["assessment_id"], "answers": answers}, headers=_headers(parent["access_token"])).status_code == 200
     with SessionLocal() as db:
         assert db.scalar(select(func.count(AssessmentAttempt.id))) == 1

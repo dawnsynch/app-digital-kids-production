@@ -19,7 +19,9 @@ from ..schemas import (
     RevisionSubmitResponse,
 )
 from ..security import get_current_user, require_learner, require_parent
-from ..services.openai_service import generate_revision_questions, mark_revision_answers
+from ..services.openai_service import generate_revision_questions
+from .assessment_workflow import mark_parent_assessment, record_assessment_created
+from ..schemas import AssessmentActionRequest
 
 router = APIRouter(prefix="/revision", tags=["revision"])
 settings = get_settings()
@@ -118,6 +120,8 @@ def generate_revision(
     db.add(attempt)
     db.commit()
     db.refresh(attempt)
+    record_assessment_created(db, attempt, current_user, "created")
+    db.commit()
 
     return {
         "assessment_id": attempt.id,
@@ -137,22 +141,8 @@ def save_revision_answers(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    attempt = ensure_assessment_access(db, current_user, payload.assessment_id)
-    for item in payload.answers:
-        if len(item.answer) > settings.max_answer_length:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Answers cannot exceed {settings.max_answer_length} characters",
-            )
-    answers = [item.model_dump() for item in payload.answers]
-    attempt.student_answers_json = json.dumps(answers, ensure_ascii=False)
-    db.add(attempt)
-    db.commit()
-    return {
-        "assessment_id": attempt.id,
-        "answers_count": len(answers),
-        "message": "Answers submitted successfully. A parent can review and mark them.",
-    }
+    ensure_assessment_access(db, current_user, payload.assessment_id)
+    raise HTTPException(status_code=409, detail="Use the idempotent learner assessment submission endpoint")
 
 
 @router.get("/learner/options", response_model=LearnerPracticeOptions)
@@ -198,6 +188,8 @@ def _learner_assessment_payload(attempt: AssessmentAttempt) -> dict:
         "difficulty": attempt.difficulty,
         "status": attempt.status,
         "questions": safe_questions,
+        "answers": json.loads(attempt.student_answers_json) if attempt.student_answers_json else None,
+        "submitted_at": attempt.submitted_at,
     }
 
 
@@ -286,6 +278,7 @@ def generate_learner_practice(
     attempt.questions_json = json.dumps(questions, ensure_ascii=False)
     attempt.status = "ready"
     db.add(attempt)
+    record_assessment_created(db, attempt, current_user)
     db.commit()
     db.refresh(attempt)
     return _learner_assessment_payload(attempt)
@@ -329,21 +322,19 @@ def submit_revision(
     current_user: User = Depends(require_parent),
 ):
     attempt = ensure_assessment_access(db, current_user, payload.assessment_id)
-    for item in payload.answers:
-        if len(item.answer) > settings.max_answer_length:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Answers cannot exceed {settings.max_answer_length} characters",
-            )
-    questions = json.loads(attempt.questions_json)
-    answers = [item.model_dump() for item in payload.answers]
-    result = mark_revision_answers(questions, answers)
-
-    attempt.student_answers_json = json.dumps(answers, ensure_ascii=False)
-    attempt.result_json = json.dumps(result, ensure_ascii=False)
-    attempt.score = float(result["score"])
-    attempt.total_marks = float(result["total_marks"])
-    db.add(attempt)
-    db.commit()
-
-    return {"assessment_id": attempt.id, **result}
+    if attempt.status not in {"submitted", "marking", "marking_failed", "needs_review", "marked", "released"}:
+        raise HTTPException(status_code=409, detail="Assessment must be submitted by the learner before marking")
+    stored = json.loads(attempt.student_answers_json or "[]")
+    supplied = [item.model_dump() for item in payload.answers]
+    if supplied != stored:
+        raise HTTPException(status_code=409, detail="Marking must use the locked submitted answer snapshot")
+    detail = mark_parent_assessment(
+        attempt.id,
+        AssessmentActionRequest(request_id=f"legacy_marking_{attempt.id}_{attempt.submission_version}_request"),
+        db,
+        current_user,
+    )
+    result = detail.get("result")
+    if not result:
+        raise HTTPException(status_code=503, detail="Marking result is unavailable")
+    return result

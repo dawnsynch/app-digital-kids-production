@@ -101,9 +101,39 @@ class AssessmentAttempt(Base):
     total_marks: Mapped[float | None] = mapped_column(Float, nullable=True)
     request_id: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True, index=True)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="ready", index=True)
+    submission_request_id: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True, index=True)
+    submission_version: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    marking_request_id: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True, index=True)
+    marking_version: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    marking_requested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    marking_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    marking_error: Mapped[str | None] = mapped_column(String(240), nullable=True)
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    reviewed_by_user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    released_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    released_by_user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
     student: Mapped[Student] = relationship(back_populates="attempts")
+    audit_events: Mapped[list["AssessmentAuditEvent"]] = relationship(back_populates="assessment")
+
+
+class AssessmentAuditEvent(Base):
+    __tablename__ = "assessment_audit_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    assessment_id: Mapped[int] = mapped_column(ForeignKey("assessment_attempts.id"), nullable=False, index=True)
+    actor_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    actor_role: Mapped[str] = mapped_column(String(20), nullable=False)
+    event_type: Mapped[str] = mapped_column(String(40), nullable=False, index=True)
+    previous_status: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    new_status: Mapped[str] = mapped_column(String(20), nullable=False)
+    version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    metadata_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    assessment: Mapped[AssessmentAttempt] = relationship(back_populates="audit_events")
 
 
 class LearningInteraction(Base):

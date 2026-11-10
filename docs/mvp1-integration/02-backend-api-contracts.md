@@ -32,23 +32,32 @@ Status: **Client** means a typed method exists in `frontend/src/api/client.ts`; 
 
 ## CBC revision, answers, and marking
 
-Phase 2A adds learner-specific contracts that derive ownership and grade from the active learner session and exclude all answer keys and rubrics:
+Phase 2A established learner-safe generation. Phase 2B adds immutable submission and a parent-controlled marking/release lifecycle:
 
 | Endpoint | Request → response | Authorization | React consumer | Status |
 |---|---|---|---|---|
 | `GET /revision/learner/options` | none → `LearnerPracticeOptions` | Active learner only | `/learner/practice`, Subjects, Mathematics | **Integrated Phase 2A** |
 | `POST /revision/learner/generate` | `LearnerPracticeGenerateRequest` → `LearnerPracticeAssessment` | Active learner; identity/grade server-derived | Practice setup | **Integrated Phase 2A** |
 | `GET /revision/learner/{assessment_id}` | path ID → `LearnerPracticeAssessment` | Owning active learner | Question player/direct resume | **Integrated Phase 2A** |
+| `POST /revision/learner/{assessment_id}/submit` | request ID + answer list → `LearnerAssessmentSubmissionReceipt` | Owning active learner | Final answer review/submission | **Integrated Phase 2B** |
+| `GET /revision/learner/{assessment_id}/submission` | path ID → submission receipt | Owning active learner | Receipt/resume | **Integrated Phase 2B** |
+| `GET /revision/learner/assessments` | none → safe recent assessment list | Active learner; own student only | Recent Practice | **Integrated Phase 2B** |
+| `GET /revision/learner/{assessment_id}/feedback` | path ID → released result | Owning active learner; released only | Released feedback | **Integrated Phase 2B** |
+| `GET /revision/parent/assessments` | optional learner/status filters → owned list | Parent only | Parent assessment workspace | **Integrated Phase 2B** |
+| `GET /revision/parent/assessments/{assessment_id}` | path ID → answers/result/audit detail | Owning parent; cross-family concealed | Parent review | **Integrated Phase 2B** |
+| `POST /revision/parent/assessments/{assessment_id}/mark` | request ID → detail/result | Owning parent; submitted/failed only | AI marking action | **Integrated Phase 2B** |
+| `POST /revision/parent/assessments/{assessment_id}/review` | request ID → status | Owning parent; valid result only | Explicit parent review | **Integrated Phase 2B** |
+| `POST /revision/parent/assessments/{assessment_id}/release` | request ID → status | Owning parent; reviewed result only | Explicit release | **Integrated Phase 2B** |
 
-The existing generic generate/detail routes are parent-only as of Phase 2A because their internal model includes marking material. `POST /revision/submit` remains parent-only. `POST /revision/answers` is retained but intentionally not wired during Phase 2A.
+The generic generate/detail routes remain parent-only because their internal model includes marking material. The legacy `POST /revision/submit` remains parent-only and can mark only the immutable submitted snapshot. The old `/revision/answers` learner-save behavior now returns `409` and directs clients to the idempotent final submission endpoint.
 
 | Method and endpoint | Request → response | Role / ownership | React surface | Status | Required changes | Test coverage |
 | --- | --- | --- | --- | --- | --- | --- |
 | `GET /revision/options` | none → untyped grades/terms/subjects/difficulty object | Any authenticated user | `/practice`, `/subjects` | Client + Preview | Add backend response schema and load setup options | Authentication exercised indirectly |
 | `POST /revision/generate` | `RevisionGenerateRequest` → `RevisionGenerateResponse` | Owning parent or linked learner for `student_id` | `/practice` | Client + Preview | Bind selected learner and retain returned assessment ID | Parent generation tested |
-| `POST /revision/answers` | `RevisionSubmitRequest` → `RevisionAnswersResponse` | Assessment's owning parent or linked learner | Future quiz screen | Client; UI missing | Save learner answers without triggering marking | Learner save tested |
-| `GET /revision/{assessment_id}` | path ID → untyped assessment detail | Assessment's owning parent or linked learner | Resume/review flow | Client method missing | Add response schema and typed client method | Cross-parent denial tested |
-| `POST /revision/submit` | `RevisionSubmitRequest` → `RevisionSubmitResponse` | Parent only and must own assessment | Parent review/results | Client; UI missing | Ensure learner UI never calls parent-only marking; render feedback/result | Learner denial and parent success tested |
+| `POST /revision/answers` | legacy request → `409` migration response | Authenticated legacy callers | None | Deprecated in Phase 2B | Use learner final submission; no mutable post-submission save | Regression test verifies rejection |
+| `GET /revision/{assessment_id}` | path ID → internal assessment detail | Owning parent only | Legacy parent flow | Preserved | New React parent review uses its explicit typed detail contract | Cross-parent denial tested |
+| `POST /revision/submit` | existing request → `RevisionSubmitResponse` | Parent only; immutable answers must already be submitted and exactly match | Legacy parent marking | Preserved/protected | Prefer idempotent parent assessment marking endpoint | Learner denial, immutable snapshot, parent success tested |
 
 ## Learning content
 

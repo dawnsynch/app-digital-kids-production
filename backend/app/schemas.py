@@ -212,6 +212,98 @@ class LearnerPracticeAssessment(BaseModel):
     difficulty: str
     status: str
     questions: list[LearnerPracticeQuestion]
+    answers: list["AnswerItem"] | None = None
+    submitted_at: datetime | None = None
+
+
+class LearnerAssessmentSubmissionRequest(BaseModel):
+    request_id: str = Field(..., min_length=16, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
+    answers: list["AnswerItem"] = Field(default_factory=list, max_length=10)
+
+    model_config = {"extra": "forbid"}
+
+
+class LearnerAssessmentSubmissionReceipt(BaseModel):
+    assessment_id: int
+    status: str
+    submission_version: int
+    submitted_at: datetime
+    answered_count: int
+    unanswered_count: int
+    message: str
+
+
+class ParentAssessmentListItem(BaseModel):
+    assessment_id: int
+    student_id: int
+    learner_name: str
+    grade: int
+    term: int
+    subject: str
+    strand: str
+    status: str
+    submitted_at: datetime | None
+    marking_completed_at: datetime | None
+    released_at: datetime | None
+
+
+class LearnerAssessmentListItem(BaseModel):
+    assessment_id: int
+    subject: str
+    strand: str
+    status: str
+    submitted_at: datetime | None
+    released_at: datetime | None
+
+
+class AssessmentAuditEventOut(BaseModel):
+    event_type: str
+    actor_user_id: int
+    actor_role: str
+    previous_status: str | None
+    new_status: str
+    version: int | None
+    created_at: datetime
+
+
+class ParentAssessmentDetail(BaseModel):
+    assessment_id: int
+    student_id: int
+    learner_name: str
+    grade: int
+    term: int
+    subject: str
+    strand: str
+    difficulty: str
+    status: str
+    questions: list[RevisionQuestion]
+    answers: list["AnswerItem"]
+    result: "RevisionSubmitResponse | None"
+    submitted_at: datetime | None
+    marking_completed_at: datetime | None
+    reviewed_at: datetime | None
+    released_at: datetime | None
+    audit_events: list[AssessmentAuditEventOut]
+
+
+class AssessmentActionRequest(BaseModel):
+    request_id: str = Field(..., min_length=16, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
+
+    model_config = {"extra": "forbid"}
+
+
+class AssessmentStatusResponse(BaseModel):
+    assessment_id: int
+    status: str
+    message: str
+
+
+class LearnerReleasedFeedback(BaseModel):
+    assessment_id: int
+    subject: str
+    strand: str
+    released_at: datetime
+    result: "RevisionSubmitResponse"
 
 
 class AnswerItem(BaseModel):

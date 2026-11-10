@@ -104,7 +104,7 @@ export default function ParentSelectLearnerPage() {
 
       <div className="parent-entry-actions">
         <button type="button" onClick={() => setDialog({ mode: 'create' })}><span>＋</span><strong>Add Learner</strong><small>Create a learner profile</small></button>
-        <button type="button" onClick={() => setFeedback('The full Parent Dashboard remains outside Phase 1B.')}><GearIcon size={30} /><strong>Parent Dashboard</strong><small>Manage learners, progress and settings</small></button>
+        <button type="button" onClick={() => navigate('/parent/assessments')}><GearIcon size={30} /><strong>Assessment Review</strong><small>Mark and release submitted work</small></button>
       </div>
       {feedback ? <AuthFeedback>{feedback}</AuthFeedback> : null}
 

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .config import get_settings
 from .database import init_db
-from .routes import admin, auth, hobbies, learner_auth, learning_interactions, students, revision, learning, progress
+from .routes import admin, assessment_workflow, auth, hobbies, learner_auth, learning_interactions, students, revision, learning, progress
 
 settings = get_settings()
 
@@ -51,6 +51,7 @@ app.include_router(auth.router)
 app.include_router(learner_auth.router)
 app.include_router(admin.router)
 app.include_router(students.router)
+app.include_router(assessment_workflow.router)
 app.include_router(revision.router)
 app.include_router(learning.router)
 app.include_router(hobbies.router)

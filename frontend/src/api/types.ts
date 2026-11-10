@@ -175,8 +175,76 @@ export interface LearnerPracticeAssessment {
   subject: string
   strand: string
   difficulty: 'Easy' | 'Medium' | 'Hard'
-  status: 'ready'
+  status: 'ready' | 'submitted' | 'marking' | 'marking_failed' | 'needs_review' | 'marked' | 'released'
   questions: LearnerPracticeQuestion[]
+  answers: RevisionAnswer[] | null
+  submitted_at: string | null
+}
+
+export interface LearnerSubmissionReceipt {
+  assessment_id: number
+  status: string
+  submission_version: number
+  submitted_at: string
+  answered_count: number
+  unanswered_count: number
+  message: string
+}
+
+export interface LearnerAssessmentListItem {
+  assessment_id: number
+  subject: string
+  strand: string
+  status: string
+  submitted_at: string | null
+  released_at: string | null
+}
+
+export interface ParentAssessmentListItem {
+  assessment_id: number
+  student_id: number
+  learner_name: string
+  grade: number
+  term: number
+  subject: string
+  strand: string
+  status: string
+  submitted_at: string | null
+  marking_completed_at: string | null
+  released_at: string | null
+}
+
+export interface AssessmentAuditEvent {
+  event_type: string
+  actor_user_id: number
+  actor_role: string
+  previous_status: string | null
+  new_status: string
+  version: number | null
+  created_at: string
+}
+
+export interface ParentAssessmentDetail extends ParentAssessmentListItem {
+  difficulty: string
+  questions: RevisionQuestion[]
+  answers: RevisionAnswer[]
+  result: RevisionResult | null
+  reviewed_at: string | null
+  audit_events: AssessmentAuditEvent[]
+}
+
+export interface AssessmentStatusResponse {
+  assessment_id: number
+  status: string
+  message: string
+}
+
+export interface LearnerReleasedFeedback {
+  assessment_id: number
+  subject: string
+  strand: string
+  released_at: string
+  result: RevisionResult
 }
 
 export interface CodingLessonRequest {

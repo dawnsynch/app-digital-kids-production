@@ -7,11 +7,17 @@ import type {
   LearnerAccessStatus,
   LearnerHandoff,
   LearnerIdentity,
+  LearnerAssessmentListItem,
   LearnerPracticeAssessment,
   LearnerPracticeGenerateRequest,
   LearnerPracticeOptions,
+  LearnerReleasedFeedback,
+  LearnerSubmissionReceipt,
   LoginCredentials,
   ParentRegistration,
+  ParentAssessmentDetail,
+  ParentAssessmentListItem,
+  AssessmentStatusResponse,
   ProgressSummary,
   RevisionAnswer,
   RevisionAssessment,
@@ -110,6 +116,30 @@ export class ApiClient {
     this.request<LearnerPracticeAssessment>('/revision/learner/generate', { method: 'POST', body: payload })
   learnerPracticeAssessment = (assessmentId: number) =>
     this.request<LearnerPracticeAssessment>(`/revision/learner/${assessmentId}`)
+  submitLearnerAssessment = (assessmentId: number, requestId: string, answers: RevisionAnswer[]) =>
+    this.request<LearnerSubmissionReceipt>(`/revision/learner/${assessmentId}/submit`, {
+      method: 'POST', body: { request_id: requestId, answers },
+    })
+  learnerSubmissionStatus = (assessmentId: number) =>
+    this.request<LearnerSubmissionReceipt>(`/revision/learner/${assessmentId}/submission`)
+  learnerReleasedFeedback = (assessmentId: number) =>
+    this.request<LearnerReleasedFeedback>(`/revision/learner/${assessmentId}/feedback`)
+  learnerAssessments = () => this.request<LearnerAssessmentListItem[]>('/revision/learner/assessments')
+  parentAssessments = (filters: { studentId?: number; status?: string } = {}) => {
+    const query = new URLSearchParams()
+    if (filters.studentId) query.set('student_id', String(filters.studentId))
+    if (filters.status) query.set('status', filters.status)
+    const suffix = query.size ? `?${query}` : ''
+    return this.request<ParentAssessmentListItem[]>(`/revision/parent/assessments${suffix}`)
+  }
+  parentAssessment = (assessmentId: number) =>
+    this.request<ParentAssessmentDetail>(`/revision/parent/assessments/${assessmentId}`)
+  markParentAssessment = (assessmentId: number, requestId: string) =>
+    this.request<ParentAssessmentDetail>(`/revision/parent/assessments/${assessmentId}/mark`, { method: 'POST', body: { request_id: requestId } })
+  reviewParentAssessment = (assessmentId: number, requestId: string) =>
+    this.request<AssessmentStatusResponse>(`/revision/parent/assessments/${assessmentId}/review`, { method: 'POST', body: { request_id: requestId } })
+  releaseParentAssessment = (assessmentId: number, requestId: string) =>
+    this.request<AssessmentStatusResponse>(`/revision/parent/assessments/${assessmentId}/release`, { method: 'POST', body: { request_id: requestId } })
   revisionOptions = () => this.request<RevisionOptions>('/revision/options')
   generateRevision = (payload: RevisionGenerateRequest) => this.request<RevisionAssessment>('/revision/generate', { method: 'POST', body: payload })
   saveRevisionAnswers = (assessmentId: number, answers: RevisionAnswer[]) =>

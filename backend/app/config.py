@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     max_questions_per_request: int = 10
     max_answer_length: int = 2000
     max_ai_requests_per_learner_per_hour: int = 50
+    max_marking_requests_per_parent_per_hour: int = 50
     openai_timeout_seconds: int = 60
     openai_retry_count: int = 2
 

@@ -4,7 +4,7 @@ Consolidated Phase 1 repository containing the existing FastAPI MVP and the exis
 
 ## Status
 
-**Phase 2A recommendation: CONDITIONAL GO for Phase 2B answer submission and parent marking integration; NO GO for production.** Authenticated learners can configure backend-supported CBC practice, generate/retrieve learner-scoped questions, and retain in-memory drafts while navigating the responsive player. Learner APIs never return answer keys or marking rubrics, and marking remains parent-only. See the [Phase 2A report](docs/mvp1-integration/phase2a-cbc-practice.md).
+**Phase 2B recommendation: CONDITIONAL GO for Phase 2C discovery/contract design; NO GO for analytics implementation or production.** Learners can submit one immutable final-answer snapshot; the owning parent independently marks, reviews, and releases it; the learner sees feedback only after release. See the [Phase 2B report](docs/mvp1-integration/phase2b-answer-submission-marking.md).
 
 ## Repository layout
 
@@ -58,7 +58,15 @@ Vite proxies `/api/*` to the API and removes the `/api` prefix. Set `VITE_API_BA
 
 The default configuration uses mock AI. Set a real `OPENAI_API_KEY` and explicitly disable `MOCK_AI_MODE` only when intended. Never commit `.env`.
 
-After a parent configures a learner PIN and completes the handoff, the protected Phase 2A routes are `/learner/practice`, `/learner/subjects`, and `/learner/subjects/mathematics`. Practice options and grade come from the authenticated learner API; draft answers remain in browser memory and are not submitted or marked.
+After a parent configures a learner PIN and completes the handoff, `/learner/practice` generates learner-scoped work. Drafts stay in memory until the learner confirms final submission, after which they are server-locked. The learner signs out before the parent independently opens `/parent/assessments`, marks, reviews, and releases the result. A reauthenticated learner can then reopen the assessment from Recent Practice to view released feedback.
+
+Apply migrations to a backup-tested environment before using Phase 2B:
+
+```bash
+alembic upgrade head
+```
+
+This reaches revision `20261110_03`. Do not run it against the only copy of a SQLite database; follow the backup/restore procedure linked below.
 
 ### Legacy Streamlit reference
 
@@ -129,6 +137,7 @@ python3 scripts/sqlite_backup.py \
 - [Phase 1B learner profiles](docs/mvp1-integration/phase1b-learner-profiles.md)
 - [Phase 1C secure learner authentication](docs/mvp1-integration/phase1c-secure-learner-authentication.md)
 - [Phase 2A CBC practice integration](docs/mvp1-integration/phase2a-cbc-practice.md)
+- [Phase 2B answer submission, parent marking, and feedback](docs/mvp1-integration/phase2b-answer-submission-marking.md)
 
-Phase 2B must not begin until the Phase 2A conditional-GO dependencies in the integration report are accepted.
+Phase 2C implementation must not begin until the Phase 2B conditional-GO dependencies in the integration report are accepted.
 

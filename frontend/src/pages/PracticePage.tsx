@@ -11,6 +11,8 @@ import StepIndicator from '../components/practice/StepIndicator'
 import { useUI } from '../components/ui/UIContext'
 import { SETUP_FIELDS, type SetupField } from '../data/practiceContent'
 import { usePractice } from '../practice/PracticeContext'
+import { apiClient } from '../api/client'
+import type { LearnerAssessmentListItem } from '../api/types'
 
 export default function PracticePage() {
   const { notify } = useUI()
@@ -23,11 +25,19 @@ export default function PracticePage() {
   const [values, setValues] = useState<Record<string, string>>(() => Object.fromEntries(SETUP_FIELDS.map((field) => [field.id, field.defaultValue])))
   const [difficulty, setDifficulty] = useState('medium')
   const [questions, setQuestions] = useState(10)
+  const [recent, setRecent] = useState<LearnerAssessmentListItem[]>([])
 
   useEffect(() => {
     if (!learnerMode || options) return
     void loadOptions().catch(() => undefined)
   }, [learnerMode, options, loadOptions])
+
+  useEffect(() => {
+    if (!learnerMode) return
+    let active = true
+    void apiClient.learnerAssessments().then((items) => { if (active) setRecent(items) }).catch(() => undefined)
+    return () => { active = false }
+  }, [learnerMode])
 
   useEffect(() => {
     if (!options) return
@@ -98,5 +108,6 @@ export default function PracticePage() {
       <button type="button" className="practice__start" onClick={() => void startPractice()} disabled={loading || (learnerMode && !options)}>{loading ? 'Preparing Questions…' : 'Start Practice'}{!loading && <ArrowRightIcon size={19} />}</button>
       <p className="practice__note"><ShieldCheckIcon size={17} />Questions are private to your learner session.</p>
     </div></div>
+    {learnerMode && recent.length > 0 ? <section className="practice-recent" aria-labelledby="recent-practice-title"><h2 id="recent-practice-title">Recent Practice</h2><div>{recent.map((item) => <button type="button" key={item.assessment_id} onClick={() => navigate(`/learner/practice/${item.assessment_id}`)}><span><strong>{item.subject}</strong> · {item.strand}</span><em className={`assessment-status assessment-status--${item.status}`}>{item.status.replace('_', ' ')}</em></button>)}</div></section> : null}
   </div>
 }

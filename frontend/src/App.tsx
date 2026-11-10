@@ -21,6 +21,8 @@ import ParentSignInPage from './pages/ParentSignInPage'
 import { LearnerRoute, ParentRoute, PublicParentRoute } from './auth/AuthRoutes'
 import AuthenticatedLearnerDashboardPage from './pages/AuthenticatedLearnerDashboardPage'
 import PracticeQuestionPage from './pages/PracticeQuestionPage'
+import ParentAssessmentsPage from './pages/ParentAssessmentsPage'
+import ParentAssessmentDetailPage from './pages/ParentAssessmentDetailPage'
 
 export default function App() {
   return (
@@ -35,6 +37,8 @@ export default function App() {
           </Route>
           <Route element={<ParentRoute />}>
             <Route path="select-learner" element={<ParentSelectLearnerPage />} />
+            <Route path="assessments" element={<ParentAssessmentsPage />} />
+            <Route path="assessments/:assessmentId" element={<ParentAssessmentDetailPage />} />
           </Route>
         </Route>
         <Route element={<ParentAuthLayout />}>

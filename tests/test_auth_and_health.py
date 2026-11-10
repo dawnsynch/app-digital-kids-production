@@ -217,7 +217,14 @@ def test_revision_answer_and_marking_boundaries(client: TestClient):
         "/revision/answers",
         json={"assessment_id": assessment_id, "answers": answers},
         headers=learner_headers,
-    ).status_code == 200
+    ).status_code == 409
+    submitted = client.post(
+        f"/revision/learner/{assessment_id}/submit",
+        json={"request_id": f"submission_{uuid4().hex}", "answers": answers},
+        headers=learner_headers,
+    )
+    assert submitted.status_code == 200
+    assert submitted.json()["status"] == "submitted"
     assert client.post(
         "/revision/submit",
         json={"assessment_id": assessment_id, "answers": answers},

@@ -7,7 +7,7 @@ import { PracticeProvider, usePractice } from './PracticeContext'
 
 const learner: User = { id: 20, full_name: 'Amina', email: null, username: null, role: 'learner', parent_id: 10, student_id: 30, is_active: true, created_at: '2026-11-09T00:00:00Z' }
 const options: LearnerPracticeOptions = { learner_name: 'Amina', grade: 5, terms: [1, 2, 3], subjects: [{ name: 'Mathematics', strands: ['Fractions'] }], difficulty: ['Easy', 'Medium', 'Hard'], question_counts: [5, 10] }
-const assessment: LearnerPracticeAssessment = { assessment_id: 7, grade: 5, term: 1, subject: 'Mathematics', strand: 'Fractions', difficulty: 'Medium', status: 'ready', questions: [{ id: 1, question: 'Explain a half.', marks: 2, skill_tested: 'Fractions', question_type: 'text' }] }
+const assessment: LearnerPracticeAssessment = { assessment_id: 7, grade: 5, term: 1, subject: 'Mathematics', strand: 'Fractions', difficulty: 'Medium', status: 'ready', questions: [{ id: 1, question: 'Explain a half.', marks: 2, skill_tested: 'Fractions', question_type: 'text' }], answers: null, submitted_at: null }
 
 function Harness() {
   const auth = useAuth()
@@ -17,12 +17,14 @@ function Harness() {
     <span data-testid="options">{practice.options?.learner_name || 'none'}</span>
     <span data-testid="assessment">{practice.assessment?.assessment_id || 'none'}</span>
     <span data-testid="draft">{practice.drafts[1] || 'none'}</span>
+    <span data-testid="receipt">{practice.receipt?.status || 'none'}</span>
     <span data-testid="loading">{String(practice.loading)}</span>
     <span role="alert">{practice.error}</span>
     <button onClick={() => void auth.redeemLearner('challenge', '246810')}>authenticate</button>
     <button onClick={() => void practice.loadOptions().catch(() => undefined)}>options</button>
     <button onClick={() => void practice.generate({ term: 1, subject: 'Mathematics', strand: 'Fractions', difficulty: 'Medium', question_count: 5 }).catch(() => undefined)}>generate</button>
     <button onClick={() => practice.setDraft(1, 'one half')}>draft</button>
+    <button onClick={() => void practice.submitAssessment(7).catch(() => undefined)}>submit</button>
     <button onClick={() => auth.logout()}>logout</button>
   </div>
 }
@@ -80,5 +82,23 @@ describe('PracticeProvider', () => {
     fireEvent.click(screen.getByRole('button', { name: 'logout' }))
     await waitFor(() => expect(screen.getByTestId('assessment')).toHaveTextContent('none'))
     expect(screen.getByTestId('draft')).toHaveTextContent('none')
+  })
+
+  it('submits the complete draft snapshot and reuses its request id after a retryable failure', async () => {
+    vi.spyOn(apiClient, 'generateLearnerPractice').mockResolvedValue(assessment)
+    vi.spyOn(apiClient, 'submitLearnerAssessment')
+      .mockRejectedValueOnce(new ApiError('offline', 503))
+      .mockResolvedValueOnce({ assessment_id: 7, status: 'submitted', submission_version: 1, submitted_at: '2026-11-10T00:00:00Z', answered_count: 1, unanswered_count: 0, message: 'locked' })
+    renderHarness()
+    fireEvent.click(screen.getByRole('button', { name: 'generate' }))
+    await waitFor(() => expect(screen.getByTestId('assessment')).toHaveTextContent('7'))
+    fireEvent.click(screen.getByRole('button', { name: 'draft' }))
+    fireEvent.click(screen.getByRole('button', { name: 'submit' }))
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Answers could not be submitted safely'))
+    const firstKey = vi.mocked(apiClient.submitLearnerAssessment).mock.calls[0][1]
+    expect(vi.mocked(apiClient.submitLearnerAssessment).mock.calls[0][2]).toEqual([{ question_id: 1, answer: 'one half' }])
+    fireEvent.click(screen.getByRole('button', { name: 'submit' }))
+    await waitFor(() => expect(screen.getByTestId('receipt')).toHaveTextContent('submitted'))
+    expect(vi.mocked(apiClient.submitLearnerAssessment).mock.calls[1][1]).toBe(firstKey)
   })
 })
